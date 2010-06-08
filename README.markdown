@@ -6,7 +6,7 @@ Multilingual Field Extension
 * Build Date: 01 June 2010
 * Requirements:  
 	- Symphony 2.0.6 or above
-	- Extension Language Redirect by Jonas Coch (<http://github.com/klaftertief/language-redirect>)
+	- Extension Language Redirect by Jonas Coch (<http://github.com/klaftertief/language_redirect>)
 
 - Based on TextBox Field extension by Rowan Lewis
 - markItUp! by Marcin Konicki extension supported.
