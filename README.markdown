@@ -9,7 +9,6 @@ Multilingual Field Extension
 	- Extension Language Redirect by Jonas Coch (<http://github.com/klaftertief/language_redirect>)
 
 - Based on TextBox Field extension by Rowan Lewis
-- markItUp! by Marcin Konicki extension supported.
 
 Installation
 ------------

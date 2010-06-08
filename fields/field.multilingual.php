@@ -186,7 +186,7 @@ Class fieldMultilingual extends Field {
 				`field_id` = '{$id}'
 			LIMIT 1
 		");
-				
+						
 		return $this->Database->insert($fields, "tbl_fields_{$handle}");
 							
   }
