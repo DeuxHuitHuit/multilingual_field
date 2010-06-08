@@ -8,7 +8,8 @@ Multilingual Field Extension
 	- Symphony 2.0.6 or above
 	- Extension Language Redirect 
 
-(Based on TextBox Field extension by Rowan Lewis)
+- Based on TextBox Field extension by Rowan Lewis
+- markItUp! by Marcin Konicki extension supported.
 
 Installation
 ------------
