@@ -1,5 +1,5 @@
-Address Field Extension
-=======================
+Multilingual Field Extension
+============================
 
 * Version: 1.0
 * Author: Guillem Lorman (guillem@bajoelcocotero.com)
@@ -8,6 +8,7 @@ Address Field Extension
 	- Symphony 2.0.6 or above
 	- Extension Language Redirect 
 
+(Based on TextBox Field extension by Rowan Lewis)
 
 Installation
 ------------
