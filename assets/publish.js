@@ -63,15 +63,15 @@ MultilingualField.prototype.setActiveTab = function(tab_name) {
 	var self = this;
 	
 	// hide all tab panels
-	this.field.find('.tab-panel').hide();
+	jQuery('.field-multilingual').find('.tab-panel').hide();
 	
 	// find the desired tab and activate the tab and its panel
-	this.field.find('ul.tabs li').each(function() {
+	jQuery('.field-multilingual ul.tabs li').each(function() {
 		var tab = jQuery(this);
 
 		if (tab.hasClass(tab_name)) {
 			tab.addClass('active');
-			self.field.find('.tab-' + tab_name).show();
+			tab.parent().parent().find('.tab-' + tab_name).show();
 		} else {
 			tab.removeClass('active');
 		}
