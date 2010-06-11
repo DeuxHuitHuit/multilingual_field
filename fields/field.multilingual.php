@@ -8,6 +8,7 @@ Class fieldMultilingual extends Field {
 	protected $_supported_language_codes = array();
 	protected $_current_language = array();
 	protected $_driver = null;
+	protected $Admin;
 
 	// I don't know those languages, so if You know for sure that browser uses different code,
 	// or that native name should be different, please let me know about that :).
@@ -152,6 +153,14 @@ Class fieldMultilingual extends Field {
 			array('large', false, __('Large Box')),
 			array('huge', false, __('Huge Box'))
 		);
+		
+		$this->Admin = Administration::instance();
+		$supported = $this->Admin->Configuration->get('markitup');
+		
+		if ($supported) {
+			if (!isset($this->Admin->markitup)) $this->Admin->markitup = array();
+		}
+
   }
   
   public function commit() {
@@ -188,7 +197,6 @@ Class fieldMultilingual extends Field {
 		");
 						
 		return $this->Database->insert($fields, "tbl_fields_{$handle}");
-							
   }
   
   // Create the table for storing the field's data
@@ -337,7 +345,7 @@ Class fieldMultilingual extends Field {
 		
 		return $supported[$this->get('formatter')];
 	}
-		
+			
 	/*-------------------------------------------------------------------------*/
 	/* !Settings: */
 	/*-------------------------------------------------------------------------*/
@@ -436,7 +444,7 @@ Class fieldMultilingual extends Field {
 
 	public function displayPublishPanel(&$wrapper, $data = null, $error = null, $prefix = null, $postfix = null) {
 		$this->_driver->addPublishHeaders($this->_engine->Page);
-				
+	
 		$sortorder = $this->get('sortorder');
 		$element_name = $this->get('element_name');
 		$classes = array();
@@ -516,8 +524,11 @@ Class fieldMultilingual extends Field {
 				$classes[] = $this->get('formatter');
 
 				// Add form MarkItUp extension support.
-				$classes[] = 'markItUp';
-				$classes[] = $this->getMarkup();
+				if (isset($this->Admin->markitup)) {
+					$classes[] = 'markItUp';
+					$classes[] = $this->getMarkup();	
+					array_push($this->Admin->markitup, $this->getMarkup());
+				}
 			}
 			
 			$input->setAttribute('class', implode(' ', $classes));
