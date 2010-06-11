@@ -2,7 +2,7 @@
 
 Class extension_multilingual_field extends Extension {
 	protected $addedPublishHeaders = false;
-  
+	
   // Simply outputs information to Symphony about the extension
   public function about() {
     $info = array(
@@ -133,7 +133,7 @@ Class extension_multilingual_field extends Extension {
 	}
 
 	/*-------------------------------------------------------------------------*/
-	/* Utilites: */
+	/* !Utilites: */
 	/*-------------------------------------------------------------------------*/	
 	public function addPublishHeaders($page) {
 		if ($page and !$this->addedPublishHeaders) {
@@ -143,4 +143,17 @@ Class extension_multilingual_field extends Extension {
 			$this->addedPublishHeaders = true;
 		}
 	}
+
+	public function setMarkitUp($formatter) {
+		$Admin = Administration::instance();
+		$supported = $Admin->Configuration->get('markitup');
+		
+		if ($supported) {
+			if (!isset($Admin->markitup)) $Admin->markitup = array();
+			array_push($Admin->markitup, $formatter);
+		
+		}
+		return $supported;
+	}
+
 }
