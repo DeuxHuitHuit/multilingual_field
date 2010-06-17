@@ -5,6 +5,8 @@
 jQuery(document).ready(function() {
 	jQuery('.field-multilingual').each(function() {
 		var self = jQuery(this);
+		var field = new MultilingualField(jQuery(this));	
+
 		var input = self.find('input, textarea');
 		
 		if (input.attr('length') < 1) return;
@@ -34,10 +36,6 @@ jQuery(document).ready(function() {
 		
 		update();
 	});
-
-	jQuery('.field-multilingual').each(function() {
-		var field = new MultilingualField(jQuery(this));	
-	});
 });
 
 function MultilingualField(field) {
@@ -56,7 +54,7 @@ MultilingualField.prototype.init = function() {
 	});
 	
 	// open the Map tab by default
-	this.setActiveTab('es');
+	this.setActiveTab(this.field.find('ul.tabs li:eq(0)').attr('class').split(' ')[0]);
 }
 
 MultilingualField.prototype.setActiveTab = function(tab_name) {
