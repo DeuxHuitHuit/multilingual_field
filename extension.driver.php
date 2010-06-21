@@ -99,9 +99,9 @@ Class extension_multilingual_field extends Extension {
 				$entries_table = 'tbl_entries_data_'.$field["field_id"];
 	
 				$show_columns = $this->_Parent->Database->fetch("SHOW COLUMNS FROM `{$entries_table}` LIKE 'value-%'");
-				if ($show_columns) {
-					$columns = array();
-					
+				$columns = array();
+				
+				if ($show_columns) {					
 					foreach ($show_columns as $column) {
 						$language = substr($column['Field'], strlen($column['Field'])-2);
 
@@ -114,19 +114,19 @@ Class extension_multilingual_field extends Extension {
 							$columns[] = $column['Field'];
 						}
 					}
-
-					// Add new fields
-					foreach ($languages as $language) {
-						// If columna language dosen't exist in the laguange drop columns						
-
-						if (!in_array('value-'.$language, $columns)) {
-							$this->_Parent->Database->query("ALTER TABLE  `{$entries_table}` ADD COLUMN `value-{$language}` TEXT DEFAULT NULL");
-							$this->_Parent->Database->query("ALTER TABLE  `{$entries_table}` ADD COLUMN `word_count-{$language}` INT(11) UNSIGNED DEFAULT NULL");
-							$this->_Parent->Database->query("ALTER TABLE  `{$entries_table}` ADD COLUMN `value_format-{$language}` TEXT DEFAULT NULL");
-						} 
-					}
-
 				}
+
+				// Add new fields
+				foreach ($languages as $language) {
+					// If columna language dosen't exist in the laguange drop columns						
+
+					if (!in_array('value-'.$language, $columns)) {
+						$this->_Parent->Database->query("ALTER TABLE  `{$entries_table}` ADD COLUMN `value-{$language}` TEXT DEFAULT NULL");
+						$this->_Parent->Database->query("ALTER TABLE  `{$entries_table}` ADD COLUMN `word_count-{$language}` INT(11) UNSIGNED DEFAULT NULL");
+						$this->_Parent->Database->query("ALTER TABLE  `{$entries_table}` ADD COLUMN `value_format-{$language}` TEXT DEFAULT NULL");
+					} 
+				}
+				
 			}
 		}
 
