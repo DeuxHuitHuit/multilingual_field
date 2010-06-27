@@ -299,7 +299,7 @@ Class fieldMultilingual extends Field {
 					`tbl_entries_data_%s` AS f
 				WHERE
 					f.entry_id = '%s'
-					AND f.value = '%s'
+					AND f.`value-".$this->_supported_language_codes[0]."` = '%s'
 				LIMIT 1
 			",
 			$this->get('id'), $entry_id,
@@ -311,7 +311,7 @@ Class fieldMultilingual extends Field {
 		$supported_language_codes = explode(',', General::Sanitize($this->_engine->Configuration->get('languages', 'language_redirect')));
 		$supported_language_codes = array_map('trim', $supported_language_codes);
 		$supported_language_codes = array_filter($supported_language_codes);
-		
+
 		return $supported_language_codes;
 	}
 	
@@ -607,7 +607,7 @@ Class fieldMultilingual extends Field {
 				
 				return self::__INVALID_FIELDS__;	
 			}
-			
+						
 			if ($length > 0 and $length < strlen($data)) {
 				$message = __(
 					"'%s' must be no longer than %s characters.", array(
@@ -638,7 +638,9 @@ Class fieldMultilingual extends Field {
 		$status = self::__OK__;
 
 		$result = array();
-		$result['handle'] = $this->createHandle($data['value-'.$this->_supported_language_codes[0]], $entry_id);
+		
+		if ($this->get('text_size') == 'single')
+			$result['handle'] = $this->createHandle($data['value-'.$this->_supported_language_codes[0]], $entry_id);
 		
 		foreach ($this->_supported_language_codes as $language) {
 			$result['value-'.$language] = $data['value-'.$language];
@@ -677,9 +679,11 @@ Class fieldMultilingual extends Field {
 			
 			$attributes = array(
 				'mode'			=> $mode,
-				'handle'		=> $data['handle'],
 				'word-count'	=> $data['word_count']
 			);
+			
+			if ($this->get('text_size') == 'single')
+			 $attributes['handle'] = $data['handle'];	
 			
 			$wrapper->appendChild(
 				new XMLElement(

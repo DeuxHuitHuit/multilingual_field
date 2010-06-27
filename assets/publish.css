@@ -1,19 +1,19 @@
 /*--------------------------------------------*/
 /* !Text Field size */
 /*--------------------------------------------*/
-.field-textbox .size-small {
+.field-multilingual .size-small {
 	height: 5em;
 }
-.field-textbox .size-medium {
+.field-multilingual .size-medium {
 	height: 20em;
 }
-.field-textbox .size-large {
+.field-multilingual .size-large {
 	height: 35em;
 }
-.field-textbox .size-huge {
+.field-multilingual .size-huge {
 	height: 50em;
 }
-.field-textbox i.invalid {
+.field-multilingual i.invalid {
 	color: #d42;
 }
 
