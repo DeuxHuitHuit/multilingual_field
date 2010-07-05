@@ -319,6 +319,10 @@ Class fieldMultilingual extends Field {
 		return (isset($_REQUEST['language']) && !empty($_REQUEST['language']) ? $_REQUEST['language'] : $this->_supported_language_codes[0]);
 	}
 	
+	public function setCurrentLanguage($language) {
+		$this->_current_language = $language;
+	}
+	
 	public function getMarkup() {
 		$supported = array(
 			'pb_markdown' => 'markdown', // Markdown extension
@@ -663,10 +667,13 @@ Class fieldMultilingual extends Field {
 			);
 		}
 		
-		public function appendFormattedElement(&$wrapper, $data, $encode = false, $mode = null) {
-			$data['value'] = $data['value-'.$this->_current_language];
-			$data['value_formatted'] = $data['value_format-'.$this->_current_language];
-			$data['word_count'] = $data['word_count-'.$this->_current_language];
+		public function appendFormattedElement(&$wrapper, $data, $encode = false, $mode = null, $entry_id = null, $language = null) {
+			if (empty($language))
+				$language = $this->_current_language;
+
+			$data['value'] = $data['value-'.$language];
+			$data['value_formatted'] = $data['value_format-'.$language];
+			$data['word_count'] = $data['word_count-'.$language];
 			
 			if ($mode == 'raw') {
 				$value = trim($data['value']);
