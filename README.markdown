@@ -11,6 +11,7 @@ Multilingual Field Extension
 - Based on TextBox Field extension by Rowan Lewis
 - Support WMDeditor extension by Doug Stewart
 - Support markItUp! extension by Marcin Konicki
+- Compatible with forked version extension search_index by Nick Dunn (http://github.com/6ui11em/search_index)
 
 Installation
 ------------
