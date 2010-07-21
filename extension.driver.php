@@ -13,7 +13,7 @@ Class extension_multilingual_field extends Extension {
       ),
       'name' => 'Field: Multilingual Text',
       'release-date' => '2010-06-01',
-      'version' => '1.0'
+      'version' => '1.1'
     );
     
     return $info;
@@ -53,6 +53,33 @@ Class extension_multilingual_field extends Extension {
 					'delegate' => 'Save',
 					'callback' => '__SavePreferences'
 				),
+		);
+	}
+
+	public function update($previousVersion) {
+		$fields = $this->_Parent->Database->fetch('SELECT field_id FROM tbl_fields_multilingual');
+
+		foreach ($fields as $field) {
+			$entries_table = 'tbl_entries_data_'.$field["field_id"];
+			
+			if (!$this->updateHasColumn('value', $entries_table))
+				Symphony::Database()->query("ALTER TABLE `{$entries_table}` ADD COLUMN `value` TEXT DEFAULT NULL");
+			
+		}	
+	
+		return true;
+	}
+
+
+	public function updateHasColumn($column, $table) {
+		return (boolean)Symphony::Database()->fetchVar(
+			'Field', 0,
+			"
+				SHOW COLUMNS FROM
+					`".$table."`
+				WHERE
+					Field = '".$column."'
+			"
 		);
 	}
 

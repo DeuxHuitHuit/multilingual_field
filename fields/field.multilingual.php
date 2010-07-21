@@ -198,8 +198,9 @@ Class fieldMultilingual extends Field {
     $query = "CREATE TABLE IF NOT EXISTS `tbl_entries_data_$id` (
       `id` int(11) unsigned NOT NULL auto_increment,
     	`entry_id` int(11) unsigned NOT NULL,
-    	`handle` VARCHAR(255) DEFAULT NULL,";
-
+    	`handle` VARCHAR(255) DEFAULT NULL,
+			`value` TEXT DEFAULT NULL,";
+			
     	foreach($this->_supported_language_codes as $language) {
     		$query .= "`value-".$language."` TEXT DEFAULT NULL,
 				`word_count-".$language."` INT(11) UNSIGNED DEFAULT NULL,
@@ -643,6 +644,8 @@ Class fieldMultilingual extends Field {
 
 		$result = array();
 		
+		$result['value'] = $data['value-'.$this->_supported_language_codes[0]];
+
 		if ($this->get('text_size') == 'single')
 			$result['handle'] = $this->createHandle($data['value-'.$this->_supported_language_codes[0]], $entry_id);
 		
@@ -738,4 +741,175 @@ Class fieldMultilingual extends Field {
 		public function getParameterPoolValue($data) {
 			return $data['handle'];
 		}
+
+	/*-------------------------------------------------------------------------*/
+	/*	!Datasource: */
+	/*-------------------------------------------------------------------------*/
+		
+	public function buildDSRetrivalSQL($data, &$joins, &$where, $andOperation = false) {
+		$field_id = $this->get('id');
+		
+		if (preg_match('/^(not-)?regexp:\s*/', $data[0], $matches)) {
+			$data = trim(array_pop(explode(':', $data[0], 2)));
+			$negate = ($matches[1] == '' ? '' : 'NOT');
+			
+			$data = $this->cleanValue($data);
+			$this->_key++;
+			$joins .= "
+				LEFT JOIN
+					`tbl_entries_data_{$field_id}` AS t{$field_id}_{$this->_key}
+					ON (e.id = t{$field_id}_{$this->_key}.entry_id)
+			";
+			$where .= "
+				AND {$negate}(
+					t{$field_id}_{$this->_key}.handle REGEXP '{$data}'
+					OR t{$field_id}_{$this->_key}.value REGEXP '{$data}'
+				)
+			";
+		}
+		
+		else if (preg_match('/^(not-)?boolean:\s*/', $data[0], $matches)) {
+			$data = trim(array_pop(explode(':', implode(' + ', $data), 2)));
+			$negate = ($matches[1] == '' ? '' : 'NOT');
+			
+			if ($data == '') return true;
+			
+			// Negative match?
+			if (preg_match('/^not(\W)/i', $data)) {
+				$mode = '-';
+				
+			} else {
+				$mode = '+';
+			}
+			
+			// Replace ' and ' with ' +':
+			$data = preg_replace('/(\W)and(\W)/i', '\\1+\\2', $data);
+			$data = preg_replace('/(^)and(\W)|(\W)and($)/i', '\\2\\3', $data);
+			$data = preg_replace('/(\W)not(\W)/i', '\\1-\\2', $data);
+			$data = preg_replace('/(^)not(\W)|(\W)not($)/i', '\\2\\3', $data);
+			$data = preg_replace('/([\+\-])\s*/', '\\1', $mode . $data);
+			
+			$data = $this->cleanValue($data);
+			$this->_key++;
+			$joins .= "
+				LEFT JOIN
+					`tbl_entries_data_{$field_id}` AS t{$field_id}_{$this->_key}
+					ON (e.id = t{$field_id}_{$this->_key}.entry_id)
+			";
+			$where .= "
+				AND {$negate}(MATCH (t{$field_id}_{$this->_key}.value) AGAINST ('{$data}' IN BOOLEAN MODE))
+			";
+		}
+		
+		else if (preg_match('/^(not-)?((starts|ends)-with|contains):\s*/', $data[0], $matches)) {
+			$data = trim(array_pop(explode(':', $data[0], 2)));
+			$negate = ($matches[1] == '' ? '' : 'NOT');
+			$data = $this->cleanValue($data);
+			
+			if ($matches[2] == 'ends-with') $data = "%{$data}";
+			if ($matches[2] == 'starts-with') $data = "{$data}%";
+			if ($matches[2] == 'contains') $data = "%{$data}%";
+			
+			$this->_key++;
+			$joins .= "
+				LEFT JOIN
+					`tbl_entries_data_{$field_id}` AS t{$field_id}_{$this->_key}
+					ON (e.id = t{$field_id}_{$this->_key}.entry_id)
+			";
+			$where .= "
+				AND {$negate}(
+					t{$field_id}_{$this->_key}.handle LIKE '{$data}'
+					OR t{$field_id}_{$this->_key}.value LIKE '{$data}'
+				)
+			";
+		}
+		
+		else if ($andOperation) {
+			foreach ($data as $value) {
+				$this->_key++;
+				$value = $this->cleanValue($value);
+				$joins .= "
+					LEFT JOIN
+						`tbl_entries_data_{$field_id}` AS t{$field_id}_{$this->_key}
+						ON (e.id = t{$field_id}_{$this->_key}.entry_id)
+				";
+				$where .= "
+					AND (
+						t{$field_id}_{$this->_key}.handle = '{$value}'
+						OR t{$field_id}_{$this->_key}.value = '{$value}'
+					)
+				";
+			}
+		}
+		
+		else {
+			if (!is_array($data)) $data = array($data);
+			
+			foreach ($data as &$value) {
+				$value = $this->cleanValue($value);
+			}
+			
+			$this->_key++;
+			$data = implode("', '", $data);
+			$joins .= "
+				LEFT JOIN
+					`tbl_entries_data_{$field_id}` AS t{$field_id}_{$this->_key}
+					ON (e.id = t{$field_id}_{$this->_key}.entry_id)
+			";
+			$where .= "
+				AND (
+					t{$field_id}_{$this->_key}.handle IN ('{$data}')
+					OR t{$field_id}_{$this->_key}.value IN ('{$data}')
+				)
+			";
+		}
+		
+		return true;
+	}
+		
+	/*-------------------------------------------------------------------------
+		Sorting:
+	-------------------------------------------------------------------------*/
+		
+	public function buildSortingSQL(&$joins, &$where, &$sort, $order = 'ASC') {
+		$field_id = $this->get('id');
+		
+		$joins .= "LEFT OUTER JOIN `tbl_entries_data_{$field_id}` AS ed ON (e.id = ed.entry_id) ";
+		$sort = 'ORDER BY ' . (strtolower($order) == 'random' ? 'RAND()' : "ed.value {$order}");
+	}
+		
+	/*-------------------------------------------------------------------------
+		Grouping:
+	-------------------------------------------------------------------------*/
+		
+	public function groupRecords($records) {
+		if (!is_array($records) or empty($records)) return;
+		
+		$groups = array(
+			$this->get('element_name') => array()
+		);
+		
+		foreach ($records as $record) {
+			$data = $record->getData($this->get('id'));
+			
+			$value = $data['value_formatted'];
+			$handle = $data['handle'];
+			$element = $this->get('element_name');
+			
+			if (!isset($groups[$element][$handle])) {
+				$groups[$element][$handle] = array(
+					'attr'		=> array(
+						'handle'	=> $handle
+					),
+					'records'	=> array(),
+					'groups'	=> array()
+				);
+			}
+			
+			$groups[$element][$handle]['records'][] = $record;
+		}
+		
+		return $groups;
+	}
+
 }
