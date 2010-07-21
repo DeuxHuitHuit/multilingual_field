@@ -1,7 +1,7 @@
 Multilingual Field Extension
 ============================
 
-* Version: 1.0
+* Version: 1.1
 * Author: Guillem Lorman (guillem@bajoelcocotero.com)
 * Build Date: 01 June 2010
 * Requirements:  
@@ -25,3 +25,20 @@ Installation
 4. Go to System > Preferences and enter your language codes in the Language Redirect field.
 
 5. Now add the *Multilingual Text* field to your sections.
+
+Update from version 1.0
+------------------------
+
+To update extension from version 1.0:
+
+1. Upload the new version of 'multilingual_field' folder in this archive to your Symphony 'extensions' folder.  
+
+2. Re-enable the extension selecting **Field: Mulitingual** extension, choose Enable from the with-selected menu, and then click Apply.  
+
+It's important to execute the Database updates.
+
+Changelog
+----------
+- 1.1:  
+ - Fix select box support bug.  
+ - Fix DS filtering bug.  
