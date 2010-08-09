@@ -603,7 +603,7 @@ Class fieldMultilingual extends Field {
 			
 			if (empty($data)) self::__OK__;
 			
-			if (!$this->applyValidationRules($data)) {
+			if (!$this->applyValidationRules($value)) {
 				$message = __(
 					"'%s' contains invalid data. Please check the contents.", array(
 						$this->get('label')
@@ -613,7 +613,7 @@ Class fieldMultilingual extends Field {
 				return self::__INVALID_FIELDS__;	
 			}
 						
-			if ($length > 0 and $length < strlen($data)) {
+			if ($length > 0 and $length < strlen($value)) {
 				$message = __(
 					"'%s' must be no longer than %s characters.", array(
 						$this->get('label'),
@@ -624,7 +624,7 @@ Class fieldMultilingual extends Field {
 				return self::__INVALID_FIELDS__;	
 			}
 			
-			if (!General::validateXML($this->applyFormatting($data), $errors, false, new XsltProcess)) {
+			if (!General::validateXML($this->applyFormatting($value), $errors, false, new XsltProcess)) {
 				$message = __(
 					"'%1\$s' contains invalid XML. The following error was returned: <code>%2\$s</code>", array(
 						$this->get('label'),
