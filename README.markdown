@@ -1,7 +1,7 @@
 Multilingual Field Extension
 ============================
 
-* Version: 1.1
+* Version: 1.2
 * Author: Guillem Lorman (guillem@bajoelcocotero.com)
 * Build Date: 01 June 2010
 * Requirements:  
@@ -11,6 +11,7 @@ Multilingual Field Extension
 - Based on TextBox Field extension by Rowan Lewis
 - Support WMDeditor extension by Doug Stewart
 - Support markItUp! extension by Marcin Konicki
+- Support TinyMCE formater
 - Compatible with forked version extension search_index by Nick Dunn (http://github.com/6ui11em/search_index)
 
 Installation
@@ -26,10 +27,8 @@ Installation
 
 5. Now add the *Multilingual Text* field to your sections.
 
-Update from version 1.0
-------------------------
-
-To update extension from version 1.0:
+Update from version earlier versions
+------------------------------------
 
 1. Upload the new version of 'multilingual_field' folder in this archive to your Symphony 'extensions' folder.  
 
@@ -39,6 +38,11 @@ It's important to execute the Database updates.
 
 Changelog
 ----------
+- 1.2:
+ - Add multilingual handles to work with localized URL params
+ - Add compatibility with tinyMCE formatter
+ - Add compatibility with Publish Filtering extension by Nick Dunn(http://github.com/nickdunn/publishfiltering)
+ 
 - 1.1:  
  - Fix select box support bug.  
  - Fix DS filtering bug.  
