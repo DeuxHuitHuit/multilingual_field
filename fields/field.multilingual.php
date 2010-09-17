@@ -202,7 +202,8 @@ Class fieldMultilingual extends Field {
 			`value` TEXT DEFAULT NULL,";
 			
     	foreach($this->_supported_language_codes as $language) {
-    		$query .= "`value-".$language."` TEXT DEFAULT NULL,
+    		$query .= "`handle-".$language."` VARCHAR(255) DEFAULT NULL,
+    		`value-".$language."` TEXT DEFAULT NULL,
 				`word_count-".$language."` INT(11) UNSIGNED DEFAULT NULL,
 				`value_format-".$language."` TEXT DEFAULT NULL,";
     	}
@@ -239,18 +240,21 @@ Class fieldMultilingual extends Field {
 	/* !Utilities: */
 	/* -------------------------------------------------------------------------*/
 		
-	public function createHandle($value, $entry_id) {
+	public function createHandle($value, $entry_id, $lang='') {
+		
+		if (empty($lang)) $lang = $this->_supported_language_codes[0];
+		
 		$handle = Lang::createHandle(strip_tags(html_entity_decode($value)));
 		
-		if ($this->isHandleLocked($handle, $entry_id)) {
-			if ($this->isHandleFresh($handle, $value, $entry_id)) {
-				return $this->getCurrentHandle($entry_id);
+		if ($this->isHandleLocked($handle, $entry_id, $lang)) {
+			if ($this->isHandleFresh($handle, $value, $entry_id,$lang)) {
+				return $this->getCurrentHandle($entry_id,$lang);
 			}
 			
 			else {
 				$count = 2;
 					
-					while ($this->isHandleLocked("{$handle}-{$count}", $entry_id)) $count++;
+					while ($this->isHandleLocked("{$handle}-{$count}", $entry_id, $lang)) $count++;
 					
 				return "{$handle}-{$count}";
 			}
@@ -259,11 +263,11 @@ Class fieldMultilingual extends Field {
 		return $handle;
 	}
 	
-	public function getCurrentHandle($entry_id) {
+	public function getCurrentHandle($entry_id, $lang) {
 		return $this->_engine->Database->fetchVar('handle', 0, sprintf(
 			"
 				SELECT
-					f.handle
+					f.`handle-{$lang}`
 				FROM
 					`tbl_entries_data_%s` AS f
 				WHERE
@@ -274,7 +278,7 @@ Class fieldMultilingual extends Field {
 		));
 	}
 	
-	public function isHandleLocked($handle, $entry_id) {
+	public function isHandleLocked($handle, $entry_id, $lang) {
 		return (boolean)$this->_engine->Database->fetchVar('id', 0, sprintf(
 			"
 				SELECT
@@ -282,7 +286,7 @@ Class fieldMultilingual extends Field {
 				FROM
 					`tbl_entries_data_%s` AS f
 				WHERE
-					f.handle = '%s'
+					f.`handle-{$lang}` = '%s'
 					%s
 				LIMIT 1
 			",
@@ -291,7 +295,7 @@ Class fieldMultilingual extends Field {
 		));
 	}
 	
-	public function isHandleFresh($handle, $value, $entry_id) {
+	public function isHandleFresh($handle, $value, $entry_id, $lang) {
 		return (boolean)$this->_engine->Database->fetchVar('id', 0, sprintf(
 			"
 				SELECT
@@ -300,7 +304,7 @@ Class fieldMultilingual extends Field {
 					`tbl_entries_data_%s` AS f
 				WHERE
 					f.entry_id = '%s'
-					AND f.`value-".$this->_supported_language_codes[0]."` = '%s'
+					AND f.`value-{$lang}` = '%s'
 				LIMIT 1
 			",
 			$this->get('id'), $entry_id,
@@ -468,23 +472,33 @@ Class fieldMultilingual extends Field {
 			$label->appendChild(new XMLElement('i', $optional));
 		}
 		
+		// Publish filtering fields in  default language
+		$callback = Administration::instance()->getPageCallback();
+		$is_publish_filtering = $callback['driver'] == 'filters';
 		
 		/* Tabs */
-		$ul = new XMLElement('ul');	
-		$ul->setAttribute('class', 'tabs');
-		
-		foreach($this->_supported_language_codes as $language) {
-			$li = new XMLElement('li',($this->_lang[$language] ? $this->_lang[$language] : $lang));	
-			$li->setAttribute('class', $language);
+		if (!$is_publish_filtering) {
+			$ul = new XMLElement('ul');	
+			$ul->setAttribute('class', 'tabs');
 			
-			$ul->appendChild($li);
+			foreach($this->_supported_language_codes as $language) {
+				$li = new XMLElement('li',($this->_lang[$language] ? $this->_lang[$language] : $lang));	
+				$li->setAttribute('class', $language);
+				
+				$ul->appendChild($li);
+			}
+			
+			$label->appendChild($ul);				
 		}
 		
-		$label->appendChild($ul);				
-
 		/* Inputs */
 				
+		$count = 0;
 		foreach($this->_supported_language_codes as $language) {
+			$count ++;
+			if ($is_publish_filtering && $count > 1)
+				continue; 
+
 			$panel = Widget::Label();
 
 			// Textfield
@@ -509,6 +523,7 @@ Class fieldMultilingual extends Field {
 				# Delegate: ModifyTextBoxFullFieldPublishWidget
 				# Description: Allows developers modify the textbox before it is rendered in the publish forms
 				$delegate = 'ModifyTextBoxFullFieldPublishWidget';
+
 			}
 			
 			// Add classes:
@@ -529,14 +544,31 @@ Class fieldMultilingual extends Field {
 			$input->setAttribute('class', implode(' ', $classes));
 			$input->setAttribute('length', (integer)$this->get('text_length'));
 			
-			$this->_engine->ExtensionManager->notifyMembers(
-				$delegate, '/backend/',
-				array(
-					'field'		=> &$this,
-					'label'		=> &$label,
-					'input'		=> &$input
-				)
-			);
+			if ($delegate == 'ModifyTextBoxFullFieldPublishWidget') {
+				###
+				# Delegate: ModifyTextareaFieldPublishWidget
+				# Description: Allows developers modify the textarea before it is rendered in the publish forms
+				$this->_engine->ExtensionManager->notifyMembers(
+					'ModifyTextareaFieldPublishWidget', 
+					'/backend/', 
+					array(
+						'field' => &$this, 
+						'label' => &$label, 
+						'textarea' => &$input)
+				);
+	
+				###
+				# Delegate: ModifyTextBoxFullFieldPublishWidget
+				# Description: Allows developers modify the textbox before it is rendered in the publish forms
+				$this->_engine->ExtensionManager->notifyMembers(
+					$delegate, '/backend/',
+					array(
+						'field'		=> &$this,
+						'label'		=> &$label,
+						'input'		=> &$input
+					)
+				);
+			}
 			
 			if (is_null($label)) return;
 			
@@ -645,11 +677,16 @@ Class fieldMultilingual extends Field {
 		$result = array();
 		
 		$result['value'] = $data['value-'.$this->_supported_language_codes[0]];
+	
+		if ($this->get('text_size') == 'single') {
+			$result['handle'] = $this->createHandle($result['value'], $entry_id);
 
-		if ($this->get('text_size') == 'single')
-			$result['handle'] = $this->createHandle($data['value-'.$this->_supported_language_codes[0]], $entry_id);
-		
 		foreach ($this->_supported_language_codes as $language) {
+		
+			if ($this->get('text_size') == 'single') {
+				$result['handle-'.$language] = $this->createHandle($data['value-'.$language], $entry_id, $language);
+			}
+
 			$result['value-'.$language] = $data['value-'.$language];
 			$result['word_count-'.$language] = General::countWords($data['value-'.$language]);
 			$result['value_format-'.$language] = $this->applyFormatting($data['value-'.$language]);
@@ -692,8 +729,12 @@ Class fieldMultilingual extends Field {
 				'word-count'	=> $data['word_count']
 			);
 			
-			if ($this->get('text_size') == 'single')
-			 $attributes['handle'] = $data['handle'];	
+			if ($this->get('text_size') == 'single') {
+			 $attributes['handle'] = $data['handle-'.$language];	
+			 
+			 foreach ($this->_supported_language_codes as $lang)
+				 $attributes['handle-'.$lang] = $data['handle-'.$lang];	
+			}
 			
 			$wrapper->appendChild(
 				new XMLElement(
@@ -739,7 +780,7 @@ Class fieldMultilingual extends Field {
 		}
 		
 		public function getParameterPoolValue($data) {
-			return $data['handle'];
+			return $data['handle-'.$this->_current_language];
 		}
 
 	/*-------------------------------------------------------------------------*/
@@ -762,10 +803,11 @@ Class fieldMultilingual extends Field {
 			";
 			$where .= "
 				AND {$negate}(
-					t{$field_id}_{$this->_key}.handle REGEXP '{$data}'
-					OR t{$field_id}_{$this->_key}.value REGEXP '{$data}'
+					t{$field_id}_{$this->_key}.`handle-{$this->_current_language}` REGEXP '{$data}'
+					OR t{$field_id}_{$this->_key}.`value-{$this->_current_language}` REGEXP '{$data}'
 				)
 			";
+			
 		}
 		
 		else if (preg_match('/^(not-)?boolean:\s*/', $data[0], $matches)) {
@@ -797,7 +839,7 @@ Class fieldMultilingual extends Field {
 					ON (e.id = t{$field_id}_{$this->_key}.entry_id)
 			";
 			$where .= "
-				AND {$negate}(MATCH (t{$field_id}_{$this->_key}.value) AGAINST ('{$data}' IN BOOLEAN MODE))
+				AND {$negate}(MATCH (t{$field_id}_{$this->_key}.`value-{$this->_current_language}`) AGAINST ('{$data}' IN BOOLEAN MODE))
 			";
 		}
 		
@@ -818,8 +860,8 @@ Class fieldMultilingual extends Field {
 			";
 			$where .= "
 				AND {$negate}(
-					t{$field_id}_{$this->_key}.handle LIKE '{$data}'
-					OR t{$field_id}_{$this->_key}.value LIKE '{$data}'
+					t{$field_id}_{$this->_key}.`handle-{$this->_current_language}` LIKE '{$data}'
+					OR t{$field_id}_{$this->_key}.`value-{$this->_current_language}` LIKE '{$data}'
 				)
 			";
 		}
@@ -835,8 +877,8 @@ Class fieldMultilingual extends Field {
 				";
 				$where .= "
 					AND (
-						t{$field_id}_{$this->_key}.handle = '{$value}'
-						OR t{$field_id}_{$this->_key}.value = '{$value}'
+						t{$field_id}_{$this->_key}.`handle-{$this->_current_language}` = '{$value}'
+						OR t{$field_id}_{$this->_key}.`value-{$this->_current_language}` = '{$value}'
 					)
 				";
 			}
@@ -858,8 +900,8 @@ Class fieldMultilingual extends Field {
 			";
 			$where .= "
 				AND (
-					t{$field_id}_{$this->_key}.handle IN ('{$data}')
-					OR t{$field_id}_{$this->_key}.value IN ('{$data}')
+					t{$field_id}_{$this->_key}.`handle-{$this->_current_language}` IN ('{$data}')
+					OR t{$field_id}_{$this->_key}.`value-{$this->_current_language}` IN ('{$data}')
 				)
 			";
 		}
@@ -893,7 +935,7 @@ Class fieldMultilingual extends Field {
 			$data = $record->getData($this->get('id'));
 			
 			$value = $data['value_formatted'];
-			$handle = $data['handle'];
+			$handle = $data['handle-'.$this->_current_language];
 			$element = $this->get('element_name');
 			
 			if (!isset($groups[$element][$handle])) {

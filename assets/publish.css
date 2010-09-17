@@ -83,11 +83,6 @@ div.field-multilingual ul.tabs li.active {
 	cursor: default;
 }
 
-div.field-multilingual div.gmap {
-	width: 100%;
-	height: 300px;
-}
-
 div.field-multilingual div.tab-edit {
 	
 }
@@ -104,19 +99,4 @@ div.field-multilingual div.tab-edit label {
 div.field-multilingual div.tab-edit fieldset input.text {
 	width: 100px;
 	margin-right: 5px;
-}
-
-div.field-multilingual div.tab-edit fieldset.coordinates {
-	padding-bottom: 10px;
-	border-bottom: 1px solid #E4E4DE;
-}
-
-div.field-multilingual div.tab-edit fieldset.geocode input.text {
-	width: 210px;
-}
-
-div.field-multilingual div.tab-edit fieldset.geocode label i {
-	text-align: left;
-	margin-left: 5px;
-	position: static;
 }

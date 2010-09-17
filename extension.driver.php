@@ -13,7 +13,7 @@ Class extension_multilingual_field extends Extension {
       ),
       'name' => 'Field: Multilingual Text',
       'release-date' => '2010-06-01',
-      'version' => '1.1'
+      'version' => '1.2'
     );
     
     return $info;
@@ -52,35 +52,46 @@ Class extension_multilingual_field extends Extension {
 					'page' => '/system/preferences/',
 					'delegate' => 'Save',
 					'callback' => '__SavePreferences'
-				),
+				)
 		);
 	}
 
 	public function update($previousVersion) {
-		$fields = $this->_Parent->Database->fetch('SELECT field_id FROM tbl_fields_multilingual');
+		$fields = Symphony::Database()->fetch('SELECT field_id FROM tbl_fields_multilingual');
 
-		foreach ($fields as $field) {
-			$entries_table = 'tbl_entries_data_'.$field["field_id"];
-			
-			if (!$this->updateHasColumn('value', $entries_table))
-				Symphony::Database()->query("ALTER TABLE `{$entries_table}` ADD COLUMN `value` TEXT DEFAULT NULL");
-			
-		}	
+		if(version_compare($previousVersion, '1.1', '<')){
+			foreach ($fields as $field) {
+				$entries_table = 'tbl_entries_data_'.$field["field_id"];
+				
+				if (!$this->updateHasColumn('value', $entries_table))
+					Symphony::Database()->query("ALTER TABLE `{$entries_table}` ADD COLUMN `value` TEXT DEFAULT NULL");
+				
+			}	
+		}
+
+		if(version_compare($previousVersion, '1.2', '<')){
+			foreach ($fields as $field) {
+				$entries_table = 'tbl_entries_data_'.$field["field_id"];
+				
+				$supported_language_codes = explode(',', General::Sanitize(Administration::instance()->Configuration->get('languages', 'language_redirect')));				
+
+				foreach ($supported_language_codes as $lang) {
+					if (!$this->updateHasColumn('handle-'.$lang, $entries_table)) {
+						Symphony::Database()->query("ALTER TABLE `{$entries_table}` ADD COLUMN `handle-{$lang}` TEXT DEFAULT NULL");
+						
+
+						$values = Symphony::Database()->fetch("SELECT `id`, `entry_id`, `value-{$lang}` FROM `{$entries_table}` WHERE `handle` IS NOT NULL"); 
+						foreach($values as $value) {
+							Symphony::Database()->query("UPDATE  `{$entries_table}` SET `handle-{$lang}` = '".$this->createHandle($value["value-".$lang], $value["entry_id"], $lang, $entries_table)."' WHERE id = ".$value["id"]);
+						}
+					}				
+
+				}
+				
+			}	
+		}
 	
 		return true;
-	}
-
-
-	public function updateHasColumn($column, $table) {
-		return (boolean)Symphony::Database()->fetchVar(
-			'Field', 0,
-			"
-				SHOW COLUMNS FROM
-					`".$table."`
-				WHERE
-					Field = '".$column."'
-			"
-		);
 	}
 
 	/*-------------------------------------------------------------------------*/
@@ -183,4 +194,47 @@ Class extension_multilingual_field extends Extension {
 		return $supported;
 	}
 
+	public function updateHasColumn($column, $table) {
+		return (boolean)Symphony::Database()->fetchVar(
+			'Field', 0,
+			"
+				SHOW COLUMNS FROM
+					`".$table."`
+				WHERE
+					Field = '".$column."'
+			"
+		);
+	}
+
+	public function createHandle($value, $entry_id, $lang, $tbl) {
+				
+		$handle = Lang::createHandle(strip_tags(html_entity_decode($value)));
+		
+		if ($this->isHandleLocked($handle, $entry_id, $lang, $tbl)) {
+			$count = 2;
+				
+			while ($this->isHandleLocked("{$handle}-{$count}", $entry_id, $lang, $tbl)) $count++;
+					
+			return "{$handle}-{$count}";
+		}
+		
+		return $handle;
+	}
+	
+	public function isHandleLocked($handle, $entry_id, $lang, $tbl) {
+		return (boolean)Symphony::Database()->fetchVar('id', 0, sprintf(
+			"
+				SELECT
+					f.id
+				FROM
+					`{$tbl}` AS f
+				WHERE
+					f.`handle-{$lang}` = '%s'
+					%s
+				LIMIT 1
+			",
+			$handle,
+			(!is_null($entry_id) ? "AND f.entry_id != '{$entry_id}'" : '')
+		));
+	}
 }

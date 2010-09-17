@@ -55,6 +55,11 @@ MultilingualField.prototype.init = function() {
 	
 	// open the Map tab by default
 	this.setActiveTab(this.field.find('ul.tabs li:eq(0)').attr('class').split(' ')[0]);
+	
+	// Set unique id for tynymce support
+	this.field.find('textarea.tinymce').each(function () {
+		this.id = this.name;
+	});
 }
 
 MultilingualField.prototype.setActiveTab = function(tab_name) {
@@ -69,7 +74,17 @@ MultilingualField.prototype.setActiveTab = function(tab_name) {
 
 		if (tab.hasClass(tab_name)) {
 			tab.addClass('active');
-			tab.parent().parent().find('.tab-' + tab_name).show();
+			
+			var panel = tab.parent().parent().find('.tab-' + tab_name);
+			panel.show();
+
+			// Resize hidden tinyMCE to fit to the correct size 
+			if (panel.find('textarea.tinymce').length > 0) {
+				var input = panel.find('textarea.tinymce');
+				panel.find('table.mceLayout').width('100%');
+				panel.find('table.mceLayout').height(input.attr('rows')+'em');
+				panel.find('table.mceLayout iframe').height(input.attr('rows')+'em');
+			}
 		} else {
 			tab.removeClass('active');
 		}
