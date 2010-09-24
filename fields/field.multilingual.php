@@ -678,7 +678,7 @@ Class fieldMultilingual extends Field {
 		
 		$result['value'] = $data['value-'.$this->_supported_language_codes[0]];
 	
-		if ($this->get('text_size') == 'single') {
+		if ($this->get('text_size') == 'single')
 			$result['handle'] = $this->createHandle($result['value'], $entry_id);
 
 		foreach ($this->_supported_language_codes as $language) {
