@@ -321,7 +321,14 @@ Class fieldMultilingual extends Field {
 	}
 	
 	public function getCurrentLanguage() {
-		return (isset($_REQUEST['language']) && !empty($_REQUEST['language']) ? $_REQUEST['language'] : $this->_supported_language_codes[0]);
+		$authorLang = Administration::instance()->Author->get('language');
+		if (!empty($_REQUEST['language']) && in_array($_REQUEST['language'], $this->_supported_language_codes)) {
+			return $_REQUEST['language'];
+		}
+		else if (!empty($authorLang) && in_array($authorLang, $this->_supported_language_codes)) {
+			return $authorLang;
+		}
+		return $this->_supported_language_codes[0];
 	}
 	
 	public function setCurrentLanguage($language) {
@@ -478,17 +485,18 @@ Class fieldMultilingual extends Field {
 		
 		/* Tabs */
 		if (!$is_publish_filtering) {
-			$ul = new XMLElement('ul');	
+			$ul = new XMLElement('ul');
 			$ul->setAttribute('class', 'tabs');
 			
 			foreach($this->_supported_language_codes as $language) {
+				$class = $language . ($language == $this->_current_language ? ' active' : '');
 				$li = new XMLElement('li',($this->_lang[$language] ? $this->_lang[$language] : $lang));	
-				$li->setAttribute('class', $language);
+				$li->setAttribute('class', $class);
 				
 				$ul->appendChild($li);
 			}
 			
-			$label->appendChild($ul);				
+			$label->appendChild($ul);
 		}
 		
 		/* Inputs */
@@ -497,7 +505,7 @@ Class fieldMultilingual extends Field {
 		foreach($this->_supported_language_codes as $language) {
 			$count ++;
 			if ($is_publish_filtering && $count > 1)
-				continue; 
+				continue;
 
 			$panel = Widget::Label();
 
@@ -746,7 +754,7 @@ Class fieldMultilingual extends Field {
 		}
 		
 		public function prepareTableValue($data, XMLElement $link = null) {
-			$data['value'] = $data["value-".$this->_supported_language_codes[0]];
+			$data['value'] = $data["value-".$this->_current_language];
 			
 			if (empty($data) or strlen(trim($data['value'])) == 0) return;
 			

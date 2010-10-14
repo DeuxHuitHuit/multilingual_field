@@ -45,7 +45,13 @@ function MultilingualField(field) {
 }
 
 MultilingualField.prototype.init = function() {
-	var self = this;
+	var self = this,
+		activeTab = this.field.find('ul.tabs li.active');
+
+	// Fallback to first tab if no tab is set as active by default
+	if (activeTab.length == 0) {
+		activeTab = this.field.find('ul.tabs li:eq(0)');
+	}
 
 	// bind tab events
 	this.field.find('ul.tabs li').bind('click', function(e) {
@@ -53,8 +59,8 @@ MultilingualField.prototype.init = function() {
 		self.setActiveTab(jQuery(this).attr('class').split(' ')[0]);
 	});
 	
-	// open the Map tab by default
-	this.setActiveTab(this.field.find('ul.tabs li:eq(0)').attr('class').split(' ')[0]);
+	// Show the active tab
+	this.setActiveTab(activeTab.attr('class').split(' ')[0]);
 	
 	// Set unique id for tynymce support
 	this.field.find('textarea.tinymce').each(function () {
