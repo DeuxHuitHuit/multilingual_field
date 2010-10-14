@@ -72,8 +72,7 @@ Class extension_multilingual_field extends Extension {
 		if(version_compare($previousVersion, '1.2', '<')){
 			foreach ($fields as $field) {
 				$entries_table = 'tbl_entries_data_'.$field["field_id"];
-				
-				$supported_language_codes = explode(',', General::Sanitize(Administration::instance()->Configuration->get('languages', 'language_redirect')));				
+				$supported_language_codes = preg_split('/\s*,\s*/', General::Sanitize(Administration::instance()->Configuration->get('languages', 'language_redirect')));
 
 				foreach ($supported_language_codes as $lang) {
 					if (!$this->updateHasColumn('handle-'.$lang, $entries_table)) {
