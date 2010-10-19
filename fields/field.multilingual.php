@@ -321,11 +321,16 @@ Class fieldMultilingual extends Field {
 	}
 	
 	public function getCurrentLanguage() {
-		$author = Administration::instance()->Author;
-		if (!empty($author)) {
-			$authorLang = $author->get('language');
+		$authorLang = '';
+		
+		// Only if we are in the backend
+		if (class_exists('Administration')) {
+			$author = Administration::instance()->Author;
+			if (!empty($author)) {
+				$authorLang = $author->get('language');
+			}
 		}
-
+		
 		if (!empty($_REQUEST['language']) && in_array($_REQUEST['language'], $this->_supported_language_codes)) {
 			return $_REQUEST['language'];
 		}
