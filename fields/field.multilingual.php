@@ -264,7 +264,7 @@ Class fieldMultilingual extends Field {
 	}
 	
 	public function getCurrentHandle($entry_id, $lang) {
-		return $this->_engine->Database->fetchVar('handle', 0, sprintf(
+		return $this->_engine->Database->fetchVar("handle-{$lang}", 0, sprintf(
 			"
 				SELECT
 					f.`handle-{$lang}`
