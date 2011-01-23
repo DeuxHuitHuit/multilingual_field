@@ -144,6 +144,7 @@ Class extension_multilingual_field extends Extension {
 
 						// If consolidate option AND column language not in supported languages codes -> Drop Column
 						if ($_POST['settings']['multilingual']['consolidate'] && !in_array($language, $languages)) {
+								$this->_Parent->Database->query("ALTER TABLE  `{$entries_table}` DROP COLUMN `handle-{$language}`");
 								$this->_Parent->Database->query("ALTER TABLE  `{$entries_table}` DROP COLUMN `value-{$language}`");
 								$this->_Parent->Database->query("ALTER TABLE  `{$entries_table}` DROP COLUMN `word_count-{$language}`");
 								$this->_Parent->Database->query("ALTER TABLE  `{$entries_table}` DROP COLUMN `value_format-{$language}`");
@@ -158,6 +159,7 @@ Class extension_multilingual_field extends Extension {
 					// If columna language dosen't exist in the laguange drop columns						
 
 					if (!in_array('value-'.$language, $columns)) {
+						$this->_Parent->Database->query("ALTER TABLE  `{$entries_table}` ADD COLUMN `handle-{$language}` VARCHAR(255) DEFAULT NULL");
 						$this->_Parent->Database->query("ALTER TABLE  `{$entries_table}` ADD COLUMN `value-{$language}` TEXT DEFAULT NULL");
 						$this->_Parent->Database->query("ALTER TABLE  `{$entries_table}` ADD COLUMN `word_count-{$language}` INT(11) UNSIGNED DEFAULT NULL");
 						$this->_Parent->Database->query("ALTER TABLE  `{$entries_table}` ADD COLUMN `value_format-{$language}` TEXT DEFAULT NULL");

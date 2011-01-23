@@ -264,7 +264,7 @@ Class fieldMultilingual extends Field {
 	}
 	
 	public function getCurrentHandle($entry_id, $lang) {
-		return $this->_engine->Database->fetchVar('handle', 0, sprintf(
+		return $this->_engine->Database->fetchVar('handle-{$lang}', 0, sprintf(
 			"
 				SELECT
 					f.`handle-{$lang}`
@@ -599,7 +599,8 @@ Class fieldMultilingual extends Field {
 		if ($error != null) {
 			$label = Widget::wrapFormElementWithError($label, $error);
 		}
-			
+		
+		$wrapper->setAttribute('id','field-'.$this->get('id'));	
 		$wrapper->appendChild($label);
 	}
  
@@ -770,8 +771,8 @@ Class fieldMultilingual extends Field {
 			@header('content-type: text/html');
 			
 			$max_length = (integer)$this->get('column_length');
-			$max_length = ($max_length ? $max_length : 75);
-			
+			$max_length = ($max_length ? $max_length : 999);
+
 			$value = strip_tags($data['value']);
 			
 			if ($max_length < strlen($value)) {
