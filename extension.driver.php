@@ -12,8 +12,8 @@ Class extension_multilingual_field extends Extension {
         'website' => 'http://bajoelcocotero.com/'
       ),
       'name' => 'Field: Multilingual Text',
-      'release-date' => '2010-06-01',
-      'version' => '1.2'
+      'release-date' => '2011-02-13',
+      'version' => '1.3'
     );
     
     return $info;
@@ -22,7 +22,7 @@ Class extension_multilingual_field extends Extension {
  
   // Creates the database to store all address fields
   public function install() {
-		return $this->_Parent->Database->query("CREATE TABLE `tbl_fields_multilingual` (
+		return Symphony::Database()->query("CREATE TABLE `tbl_fields_multilingual` (
       `id` int(11) unsigned NOT NULL auto_increment,
       `field_id` int(11) unsigned NOT NULL,
 			`column_length` INT(11) UNSIGNED DEFAULT 75,
@@ -37,7 +37,7 @@ Class extension_multilingual_field extends Extension {
   
   // Removes the database
   public function uninstall() {
-		$this->_Parent->Database->query("DROP TABLE `tbl_fields_multilingual`");
+		Symphony::Database()->query("DROP TABLE `tbl_fields_multilingual`");
   }
 	
 	public function getSubscribedDelegates(){
@@ -72,7 +72,7 @@ Class extension_multilingual_field extends Extension {
 		if(version_compare($previousVersion, '1.2', '<')){
 			foreach ($fields as $field) {
 				$entries_table = 'tbl_entries_data_'.$field["field_id"];
-				$supported_language_codes = preg_split('/\s*,\s*/', General::Sanitize(Administration::instance()->Configuration->get('languages', 'language_redirect')));
+				$supported_language_codes = preg_split('/\s*,\s*/', General::Sanitize(Symphony::Configuration()->get('language_codes', 'language_redirect')));
 
 				foreach ($supported_language_codes as $lang) {
 					if (!$this->updateHasColumn('handle-'.$lang, $entries_table)) {
@@ -128,14 +128,14 @@ Class extension_multilingual_field extends Extension {
 		}
 		$languages = array_unique($languages);
 
-		$fields = $this->_Parent->Database->fetch('SELECT field_id FROM tbl_fields_multilingual');
+		$fields = Symphony::Database()->fetch('SELECT field_id FROM tbl_fields_multilingual');
 
 		if ($fields) {
 			// Foreach field check multilanguage values foreach language
 			foreach ($fields as $field) {
 				$entries_table = 'tbl_entries_data_'.$field["field_id"];
 	
-				$show_columns = $this->_Parent->Database->fetch("SHOW COLUMNS FROM `{$entries_table}` LIKE 'value-%'");
+				$show_columns = Symphony::Database()->fetch("SHOW COLUMNS FROM `{$entries_table}` LIKE 'value-%'");
 				$columns = array();
 				
 				if ($show_columns) {					
@@ -144,10 +144,10 @@ Class extension_multilingual_field extends Extension {
 
 						// If consolidate option AND column language not in supported languages codes -> Drop Column
 						if ($_POST['settings']['multilingual']['consolidate'] && !in_array($language, $languages)) {
-								$this->_Parent->Database->query("ALTER TABLE  `{$entries_table}` DROP COLUMN `handle-{$language}`");
-								$this->_Parent->Database->query("ALTER TABLE  `{$entries_table}` DROP COLUMN `value-{$language}`");
-								$this->_Parent->Database->query("ALTER TABLE  `{$entries_table}` DROP COLUMN `word_count-{$language}`");
-								$this->_Parent->Database->query("ALTER TABLE  `{$entries_table}` DROP COLUMN `value_format-{$language}`");
+								Symphony::Database()->query("ALTER TABLE  `{$entries_table}` DROP COLUMN `handle-{$language}`");
+								Symphony::Database()->query("ALTER TABLE  `{$entries_table}` DROP COLUMN `value-{$language}`");
+								Symphony::Database()->query("ALTER TABLE  `{$entries_table}` DROP COLUMN `word_count-{$language}`");
+								Symphony::Database()->query("ALTER TABLE  `{$entries_table}` DROP COLUMN `value_format-{$language}`");
 						} else {
 							$columns[] = $column['Field'];
 						}
@@ -159,10 +159,10 @@ Class extension_multilingual_field extends Extension {
 					// If columna language dosen't exist in the laguange drop columns						
 
 					if (!in_array('value-'.$language, $columns)) {
-						$this->_Parent->Database->query("ALTER TABLE  `{$entries_table}` ADD COLUMN `handle-{$language}` VARCHAR(255) DEFAULT NULL");
-						$this->_Parent->Database->query("ALTER TABLE  `{$entries_table}` ADD COLUMN `value-{$language}` TEXT DEFAULT NULL");
-						$this->_Parent->Database->query("ALTER TABLE  `{$entries_table}` ADD COLUMN `word_count-{$language}` INT(11) UNSIGNED DEFAULT NULL");
-						$this->_Parent->Database->query("ALTER TABLE  `{$entries_table}` ADD COLUMN `value_format-{$language}` TEXT DEFAULT NULL");
+						Symphony::Database()->query("ALTER TABLE  `{$entries_table}` ADD COLUMN `handle-{$language}` VARCHAR(255) DEFAULT NULL");
+						Symphony::Database()->query("ALTER TABLE  `{$entries_table}` ADD COLUMN `value-{$language}` TEXT DEFAULT NULL");
+						Symphony::Database()->query("ALTER TABLE  `{$entries_table}` ADD COLUMN `word_count-{$language}` INT(11) UNSIGNED DEFAULT NULL");
+						Symphony::Database()->query("ALTER TABLE  `{$entries_table}` ADD COLUMN `value_format-{$language}` TEXT DEFAULT NULL");
 					} 
 				}
 				
@@ -176,8 +176,8 @@ Class extension_multilingual_field extends Extension {
 	/*-------------------------------------------------------------------------*/	
 	public function addPublishHeaders($page) {
 		if ($page and !$this->addedPublishHeaders) {
-			$page->addStylesheetToHead(URL . '/extensions/multilingual_field/assets/publish.css', 'screen', 10251840);
-			$page->addScriptToHead(URL . '/extensions/multilingual_field/assets/publish.js', 10251840);
+			$page->addStylesheetToHead(URL . '/extensions/multilingual_field/assets/multilingual_field.publish.css', 'screen', 10251840);
+			$page->addScriptToHead(URL . '/extensions/multilingual_field/assets/multilingual_field.publish.js', 10251840);
 			
 			$this->addedPublishHeaders = true;
 		}
@@ -185,7 +185,7 @@ Class extension_multilingual_field extends Extension {
 
 	public function setMarkitUp($formatter) {
 		$Admin = Administration::instance();
-		$supported = $Admin->Configuration->get('markitup');
+		$supported = Symphony::Configuration()->get('markitup');
 		
 		if ($supported) {
 			if (!isset($Admin->markitup)) $Admin->markitup = array();

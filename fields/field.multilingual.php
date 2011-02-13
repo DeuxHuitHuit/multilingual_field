@@ -179,7 +179,7 @@ Class fieldMultilingual extends Field {
 			)
 		);
 		
-		$this->Database->query("
+		Symphony::Database()->query("
 			DELETE FROM
 				`tbl_fields_{$handle}`
 			WHERE
@@ -187,7 +187,7 @@ Class fieldMultilingual extends Field {
 			LIMIT 1
 		");
 						
-		return $this->Database->insert($fields, "tbl_fields_{$handle}");
+		return Symphony::Database()->insert($fields, "tbl_fields_{$handle}");
   }
   
   // Create the table for storing the field's data
@@ -212,7 +212,7 @@ Class fieldMultilingual extends Field {
 			KEY `entry_id` (`entry_id`)
     )";
 
-		return $this->_engine->Database->query($query);
+		return Symphony::Database()->query($query);
 		
   }
   
@@ -264,7 +264,7 @@ Class fieldMultilingual extends Field {
 	}
 	
 	public function getCurrentHandle($entry_id, $lang) {
-		return $this->_engine->Database->fetchVar('handle-{$lang}', 0, sprintf(
+		return Symphony::Database()->fetchVar('handle-{$lang}', 0, sprintf(
 			"
 				SELECT
 					f.`handle-{$lang}`
@@ -279,7 +279,7 @@ Class fieldMultilingual extends Field {
 	}
 	
 	public function isHandleLocked($handle, $entry_id, $lang) {
-		return (boolean)$this->_engine->Database->fetchVar('id', 0, sprintf(
+		return (boolean)Symphony::Database()->fetchVar('id', 0, sprintf(
 			"
 				SELECT
 					f.id
@@ -296,7 +296,7 @@ Class fieldMultilingual extends Field {
 	}
 	
 	public function isHandleFresh($handle, $value, $entry_id, $lang) {
-		return (boolean)$this->_engine->Database->fetchVar('id', 0, sprintf(
+		return (boolean)Symphony::Engine()->Database->fetchVar('id', 0, sprintf(
 			"
 				SELECT
 					f.id
@@ -313,7 +313,7 @@ Class fieldMultilingual extends Field {
 	}
 
 	public function getSupportedLanguageCodes() {
-		$supported_language_codes = explode(',', General::Sanitize($this->_engine->Configuration->get('languages', 'language_redirect')));
+		$supported_language_codes = explode(',', General::Sanitize(Symphony::Configuration()->get('language_codes', 'language_redirect')));
 		$supported_language_codes = array_map('trim', $supported_language_codes);
 		$supported_language_codes = array_filter($supported_language_codes);
 
