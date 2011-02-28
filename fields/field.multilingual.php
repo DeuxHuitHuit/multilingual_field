@@ -131,7 +131,7 @@ Class fieldMultilingual extends Field {
 
   public function __construct(&$parent) {
     parent::__construct($parent);
-    $this->_name = 'Multilingual Text';
+    $this->_name = __('Multilingual Text');
     $this->_required = true;
 		$this->_driver = $this->_engine->ExtensionManager->create('multilingual_field');
 
@@ -383,7 +383,7 @@ Class fieldMultilingual extends Field {
 			$value[1] = $value[0] == $this->get('text_size');
 		}
 		
-		$label = Widget::Label('Size');
+		$label = Widget::Label(__('Size'));
 		$label->appendChild(Widget::Select(
 			"fields[{$order}][text_size]", $values
 		));
@@ -444,7 +444,7 @@ Class fieldMultilingual extends Field {
 		$group->setAttribute('class', 'group');
 
 		$group->appendChild(Widget::Label(
-			__('Current supported languages: '.implode(',',$this->_supported_language_codes))
+			__('Current supported languages: ').implode(',',$this->_supported_language_codes)
 		));
 
 		$wrapper->appendChild($group);
