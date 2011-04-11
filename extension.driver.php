@@ -117,7 +117,7 @@ Class extension_multilingual_field extends Extension {
 
 	public function __SavePreferences($context){
 		
-		$language_codes = explode(',', $_POST['settings']['language_redirect']['languages']);
+		$language_codes = explode(',', $_POST['settings']['language_redirect']['languages_codes']);
 		$language_codes = array_map('trim', $language_codes);
 		$language_codes = array_filter($language_codes);
 		
@@ -175,11 +175,16 @@ Class extension_multilingual_field extends Extension {
 	/* !Utilites: */
 	/*-------------------------------------------------------------------------*/	
 	public function addPublishHeaders($page) {
-		if ($page and !$this->addedPublishHeaders) {
-			$page->addStylesheetToHead(URL . '/extensions/multilingual_field/assets/multilingual_field.publish.css', 'screen', 10251840);
-			$page->addScriptToHead(URL . '/extensions/multilingual_field/assets/multilingual_field.publish.js', 10251840);
-			
-			$this->addedPublishHeaders = true;
+		$callback = Administration::instance()->getPageCallback();
+		if ( ($callback['driver'] == 'publish') && ( $callback['context']['page'] == 'new' || $callback['context']['page'] == 'edit') ) {
+
+			if ($page and !$this->addedPublishHeaders) {
+				$page->addStylesheetToHead(URL . '/extensions/multilingual_field/assets/multilingual_field.publish.css', 'screen', 10251840);
+				$page->addScriptToHead(URL . '/extensions/multilingual_field/assets/multilingual_field.publish.js', 10251840);
+				
+				$this->addedPublishHeaders = true;
+			}
+
 		}
 	}
 
