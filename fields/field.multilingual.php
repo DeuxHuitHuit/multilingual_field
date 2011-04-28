@@ -490,8 +490,8 @@ Class fieldMultilingual extends Field {
 		
 		// Publish filtering fields in  default language
 		$callback = Administration::instance()->getPageCallback();
-		$is_publish_filtering = $callback['driver'] == 'filters';
-		
+		$is_publish_filtering = $callback['driver'] == 'publish';
+
 		/* Tabs */
 		if (!$is_publish_filtering) {
 			$ul = new XMLElement('ul');
