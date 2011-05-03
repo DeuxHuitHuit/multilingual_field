@@ -243,4 +243,8 @@ Class extension_multilingual_field extends Extension {
 			(!is_null($entry_id) ? "AND f.entry_id != '{$entry_id}'" : '')
 		));
 	}
+	
+	public function getAddedPublishHeaders() {
+		return $this->addedPublishHeaders;
+	}
 }

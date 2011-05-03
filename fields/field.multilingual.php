@@ -490,7 +490,9 @@ Class fieldMultilingual extends Field {
 		
 		// Publish filtering fields in  default language
 		$callback = Administration::instance()->getPageCallback();
-		$is_publish_filtering = $callback['driver'] == 'publish';
+
+		// Publish filtering fields in  default language
+		$is_publish_filtering = !$this->_driver->getAddedPublishHeaders();
 
 		/* Tabs */
 		if (!$is_publish_filtering) {
