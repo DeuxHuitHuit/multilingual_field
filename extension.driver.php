@@ -176,7 +176,7 @@ Class extension_multilingual_field extends Extension {
 	/*-------------------------------------------------------------------------*/	
 	public function addPublishHeaders($page) {
 		$callback = Administration::instance()->getPageCallback();
-		if ( ($callback['driver'] == 'publish') && ( $callback['context']['page'] == 'new' || $callback['context']['page'] == 'edit') ||	( $callback['driver'] != 'publish' )) {
+		if ( ($callback['driver'] == 'publish') && ( $callback['context']['page'] == 'new' || $callback['context']['page'] == 'edit') ||	(( $callback['driver'] != 'publish' ) && $callback['driver'] != 'filter' )) {
 
 			if ($page and !$this->addedPublishHeaders) {
 				$page->addStylesheetToHead(URL . '/extensions/multilingual_field/assets/multilingual_field.publish.css', 'screen', 10251840);
