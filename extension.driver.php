@@ -72,7 +72,14 @@ Class extension_multilingual_field extends Extension {
 		if(version_compare($previousVersion, '1.2', '<')){
 			foreach ($fields as $field) {
 				$entries_table = 'tbl_entries_data_'.$field["field_id"];
-				$supported_language_codes = preg_split('/\s*,\s*/', General::Sanitize(Symphony::Configuration()->get('language_codes', 'language_redirect')));
+				
+				$supported_language_codes = General::Sanitize(Symphony::Configuration()->get('language_codes', 'language_redirect'));
+				// Support for older versions of Language Redirect
+				if (empty($supported_language_codes)) {
+					$supported_language_codes = General::Sanitize(Symphony::Configuration()->get('language_codes', 'languages'));
+				}
+				
+				$supported_language_codes = preg_split('/\s*,\s*/', $supported_language_codes);
 
 				foreach ($supported_language_codes as $lang) {
 					if (!$this->updateHasColumn('handle-'.$lang, $entries_table)) {
@@ -116,8 +123,10 @@ Class extension_multilingual_field extends Extension {
 	}
 
 	public function __SavePreferences($context){
-		
-		$language_codes = explode(',', $_POST['settings']['language_redirect']['languages_codes']);
+	
+		// Support for older versions of Language Redirect
+		$language_codes = isset($_POST['settings']['language_redirect']['language_codes']) ? explode(',', $_POST['settings']['language_redirect']['language_codes']) : explode(',', $_POST['settings']['language_redirect']['languages']);
+	
 		$language_codes = array_map('trim', $language_codes);
 		$language_codes = array_filter($language_codes);
 		
