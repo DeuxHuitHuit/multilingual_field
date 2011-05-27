@@ -460,7 +460,7 @@ Class fieldMultilingual extends Field {
 
 	public function displayPublishPanel(&$wrapper, $data = null, $error = null, $prefix = null, $postfix = null) {
 		$this->_driver->addPublishHeaders($this->_engine->Page);
-	
+		
 		$sortorder = $this->get('sortorder');
 		$element_name = $this->get('element_name');
 		$classes = array();
@@ -495,20 +495,22 @@ Class fieldMultilingual extends Field {
 		$is_publish_filtering = !$this->_driver->getAddedPublishHeaders();
 
 		/* Tabs */
-		if (!$is_publish_filtering) {
-			$ul = new XMLElement('ul');
-			$ul->setAttribute('class', 'tabs');
+		if ($is_publish_filtering) {
+			return '';
+		}		
+
+		$ul = new XMLElement('ul');
+		$ul->setAttribute('class', 'tabs');
+		
+		foreach($this->_supported_language_codes as $language) {
+			$class = $language . ($language == $this->_current_language ? ' active' : '');
+			$li = new XMLElement('li',($this->_lang[$language] ? $this->_lang[$language] : $lang));	
+			$li->setAttribute('class', $class);
 			
-			foreach($this->_supported_language_codes as $language) {
-				$class = $language . ($language == $this->_current_language ? ' active' : '');
-				$li = new XMLElement('li',($this->_lang[$language] ? $this->_lang[$language] : $lang));	
-				$li->setAttribute('class', $class);
-				
-				$ul->appendChild($li);
-			}
-			
-			$label->appendChild($ul);
+			$ul->appendChild($li);
 		}
+		
+		$label->appendChild($ul);
 		
 		/* Inputs */
 				
@@ -642,7 +644,7 @@ Class fieldMultilingual extends Field {
 		
 		foreach ($this->_supported_language_codes as $language) {
 			$value = $data['value-'.$language];
-	
+				
 			if ($this->get('required') == 'yes' and strlen(trim($value)) == 0) {
 				$message = __(
 					"'%s' is a required field.", array(
@@ -664,7 +666,7 @@ Class fieldMultilingual extends Field {
 				
 				return self::__INVALID_FIELDS__;	
 			}
-						
+
 			if ($length > 0 and $length < strlen($value)) {
 				$message = __(
 					"'%s' must be no longer than %s characters.", array(
@@ -695,26 +697,66 @@ Class fieldMultilingual extends Field {
 		$status = self::__OK__;
 
 		$result = array();
+		$entry_data = array();
 		
-		$result['value'] = $data['value-'.$this->_supported_language_codes[0]];
-	
-		if ($this->get('text_size') == 'single')
-			$result['handle'] = $this->createHandle($result['value'], $entry_id);
-
+		if (!empty($entry_id)) {
+			$field_id = $this->get('id');
+			$entry_data = Symphony::Database()->fetchRow(0, "SELECT * FROM `tbl_entries_data_{$field_id}` WHERE `entry_id` = {$entry_id}");
+		}
+		
+		if (!empty($data['value-'.$this->_supported_language_codes[0]])) {
+			$result['value'] = $data['value-'.$this->_supported_language_codes[0]];
+		
+			if ($this->get('text_size') == 'single')
+				$result['handle'] = $this->createHandle($result['value'], $entry_id);
+		} else {
+			$result['value'] = $entry_data['value-'.$this->_supported_language_codes[0]];
+		
+			if ($this->get('text_size') == 'single')
+				$result['handle'] = $this->createHandle($entry_data['value'], $entry_id);
+		}
+		
 		foreach ($this->_supported_language_codes as $language) {
 		
-			if ($this->get('text_size') == 'single') {
-				$result['handle-'.$language] = $this->createHandle($data['value-'.$language], $entry_id, $language);
-			}
+			if (isset($data['value-'.$language])) {
+				if ($this->get('text_size') == 'single') {
+					$result['handle-'.$language] = $this->createHandle($data['value-'.$language], $entry_id, $language);
+				}
 
-			$result['value-'.$language] = $data['value-'.$language];
-			$result['word_count-'.$language] = General::countWords($data['value-'.$language]);
-			$result['value_format-'.$language] = $this->applyFormatting($data['value-'.$language]);
+				$result['value-'.$language] = $data['value-'.$language];
+				$result['word_count-'.$language] = General::countWords($data['value-'.$language]);
+				$result['value_format-'.$language] = $this->applyFormatting($data['value-'.$language]);
+			} else {
+				if ($this->get('text_size') == 'single') {
+					$result['handle-'.$language] = $this->createHandle($entry_data['value-'.$language], $entry_id, $language);
+				}
+
+				$result['value-'.$language] = $entry_data['value-'.$language];
+				$result['word_count-'.$language] = General::countWords($entry_data['value-'.$language]);
+				$result['value_format-'.$language] = $this->applyFormatting($entry_data['value-'.$language]);
+			}
 		}
 		
 		return $result;
 	}
 	
+	public function getExampleFormMarkup(){
+
+		$fieldname = 'fields['.$this->get('element_name').'][value-{$url-language}]';
+
+		$label = Widget::Label($this->get('label').'
+		<!-- Modify just current language value -->
+		<input name="fields['.$this->get('element_name').'][value-{$url-language}]" type="text" /> 
+		
+		<!-- Modify all values -->');
+
+		foreach ($this->_supported_language_codes as $language) {
+			$fieldname = 'fields['.$this->get('element_name').'][value-'.$language.']';
+			$label->appendChild(Widget::Input($fieldname));
+		}
+
+		return $label;
+	}
 
 	/*-------------------------------------------------------------------------*/
 	/*	!Output: */
