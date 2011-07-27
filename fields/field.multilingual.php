@@ -1,12 +1,15 @@
-<?php if (!defined('__IN_SYMPHONY__')) die('No direct script access.');
+<?php 
 
-require_once(TOOLKIT . '/class.xsltprocess.php');
-require_once(EXTENSIONS . 'lib/class.LanguageRedirect.php');
+	if (!defined('__IN_SYMPHONY__')) die('<h2>Symphony Error</h2><p>You cannot directly access this file</p>');
+
+	require_once(TOOLKIT . '/class.xsltprocess.php');
+	require_once(EXTENSIONS . '/language_redirect/lib/class.languageredirect.php');
 
 Class fieldMultilingual extends Field {
 
 	protected $_sizes = array();
 	protected $_driver = null;
+	protected $_lang = array(); 
 
 	/*------------------------------------------------------------------------- */
 	/* !Definition: */
@@ -18,8 +21,8 @@ Class fieldMultilingual extends Field {
     	$this->_required = true;
 		$this->_driver = $this->_engine->ExtensionManager->create('multilingual_field');
 
-
 		// Get supported languages
+		$this->_lang = LanguageRedirect::instance()->getAllLanguages();
 		$this->_supported_language_codes = LanguageRedirect::instance()->getSupportedLanguageCodes();
 		$this->_current_language = $this->getCurrentLanguage();
 
@@ -131,15 +134,29 @@ Class fieldMultilingual extends Field {
 
 		if ($this->isHandleLocked($handle, $entry_id, $lang)) {
 			if ($this->isHandleFresh($handle, $value, $entry_id,$lang)) {
-				return $this->getCurrentHandle($entry_id,$lang);
+				
+				echo 'current  ';
+				
+				$handle = $this->getCurrentHandle($entry_id,$lang);
+				
+				echo $handle;
+				echo '\n';
 			}
 
 			else {
 				$count = 2;
 
-					while ($this->isHandleLocked("{$handle}-{$count}", $entry_id, $lang)) $count++;
+				while ($this->isHandleLocked("{$handle}-{$count}", $entry_id, $lang)) { 
+					$count++;
+				}
+				
+				echo $count;
+				//die;
+				echo '  ';
+				echo $handle;
+				echo '\n';
 
-				return "{$handle}-{$count}";
+				$handle = "{$handle}-{$count}";
 			}
 		}
 
@@ -321,7 +338,7 @@ Class fieldMultilingual extends Field {
 		$group->setAttribute('class', 'group');
 
 		$group->appendChild(Widget::Label(
-			__('Current supported languages: ').implode(',',$this->_supported_language_codes)
+			__('Current supported languages: ') . implode(',',$this->_supported_language_codes)
 		));
 
 		$wrapper->appendChild($group);
