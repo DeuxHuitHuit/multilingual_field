@@ -40,7 +40,7 @@ Changelog
 ----------
 - 1.4:
  - Language Redirect 1.0.2 compatibily
- - Refactor the create handle function: Allow duplicate just as the normal input field
+ - Refactor the create handle function: Allow duplicate just as the normal input field     
  	Use the Unique Field Extension to disallow duplicate entries
 
 - 1.3:
