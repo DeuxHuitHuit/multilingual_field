@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 	if (!defined('__IN_SYMPHONY__')) die('<h2>Symphony Error</h2><p>You cannot directly access this file</p>');
 
@@ -9,7 +9,7 @@ Class fieldMultilingual extends Field {
 
 	protected $_sizes = array();
 	protected $_driver = null;
-	protected $_lang = array(); 
+	protected $_lang = array();
 
 	/*------------------------------------------------------------------------- */
 	/* !Definition: */
@@ -132,84 +132,7 @@ Class fieldMultilingual extends Field {
 
 		$handle = Lang::createHandle(strip_tags(html_entity_decode($value)));
 
-		if ($this->isHandleLocked($handle, $entry_id, $lang)) {
-			if ($this->isHandleFresh($handle, $value, $entry_id,$lang)) {
-				
-				echo 'current  ';
-				
-				$handle = $this->getCurrentHandle($entry_id,$lang);
-				
-				echo $handle;
-				echo '\n';
-			}
-
-			else {
-				$count = 2;
-
-				while ($this->isHandleLocked("{$handle}-{$count}", $entry_id, $lang)) { 
-					$count++;
-				}
-				
-				echo $count;
-				//die;
-				echo '  ';
-				echo $handle;
-				echo '\n';
-
-				$handle = "{$handle}-{$count}";
-			}
-		}
-
 		return $handle;
-	}
-
-	public function getCurrentHandle($entry_id, $lang) {
-		return Symphony::Database()->fetchVar('handle-{$lang}', 0, sprintf(
-			"
-				SELECT
-					f.`handle-{$lang}`
-				FROM
-					`tbl_entries_data_%s` AS f
-				WHERE
-					f.entry_id = '%s'
-				LIMIT 1
-			",
-			$this->get('id'), $entry_id
-		));
-	}
-
-	public function isHandleLocked($handle, $entry_id, $lang) {
-		return (boolean)Symphony::Database()->fetchVar('id', 0, sprintf(
-			"
-				SELECT
-					f.id
-				FROM
-					`tbl_entries_data_%s` AS f
-				WHERE
-					f.`handle-{$lang}` = '%s'
-					%s
-				LIMIT 1
-			",
-			$this->get('id'), $handle,
-			(!is_null($entry_id) ? "AND f.entry_id != '{$entry_id}'" : '')
-		));
-	}
-
-	public function isHandleFresh($handle, $value, $entry_id, $lang) {
-		return (boolean)Symphony::Engine()->Database->fetchVar('id', 0, sprintf(
-			"
-				SELECT
-					f.id
-				FROM
-					`tbl_entries_data_%s` AS f
-				WHERE
-					f.entry_id = '%s'
-					AND f.`value-{$lang}` = '%s'
-				LIMIT 1
-			",
-			$this->get('id'), $entry_id,
-			$this->cleanValue(General::sanitize($value))
-		));
 	}
 
 	public function getCurrentLanguage() {
@@ -593,25 +516,29 @@ Class fieldMultilingual extends Field {
 		$result = array();
 		$entry_data = array();
 
+		// if an entry_id is passed, get all the current data from the DB
 		if (!empty($entry_id)) {
 			$field_id = $this->get('id');
 			$entry_data = Symphony::Database()->fetchRow(0, "SELECT * FROM `tbl_entries_data_{$field_id}` WHERE `entry_id` = {$entry_id}");
 		}
 
+		// If we have a submitted value
 		if (!empty($data['value-'.$this->_supported_language_codes[0]])) {
 			$result['value'] = $data['value-'.$this->_supported_language_codes[0]];
 
 			if ($this->get('text_size') == 'single')
 				$result['handle'] = $this->createHandle($result['value'], $entry_id);
-		} else {
+		} else { // use data from the DB
 			$result['value'] = $entry_data['value-'.$this->_supported_language_codes[0]];
 
 			if ($this->get('text_size') == 'single')
 				$result['handle'] = $this->createHandle($entry_data['value'], $entry_id);
 		}
 
+		// for each supported languages
 		foreach ($this->_supported_language_codes as $language) {
 
+			// check if data was set from submit
 			if (isset($data['value-'.$language])) {
 				if ($this->get('text_size') == 'single') {
 					$result['handle-'.$language] = $this->createHandle($data['value-'.$language], $entry_id, $language);
@@ -620,7 +547,7 @@ Class fieldMultilingual extends Field {
 				$result['value-'.$language] = $data['value-'.$language];
 				$result['word_count-'.$language] = General::countWords($data['value-'.$language]);
 				$result['value_format-'.$language] = $this->applyFormatting($data['value-'.$language]);
-			} else {
+			} else { // use data in DB
 				if ($this->get('text_size') == 'single') {
 					$result['handle-'.$language] = $this->createHandle($entry_data['value-'.$language], $entry_id, $language);
 				}
@@ -631,6 +558,7 @@ Class fieldMultilingual extends Field {
 			}
 		}
 
+		// return array that will be inserted
 		return $result;
 	}
 

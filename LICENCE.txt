@@ -1,9 +1,10 @@
-All source code included in the "Address Field" Symphony Extension archive
+All source code included in this Symphony Extension archive
 is, unless otherwise specified, released under the MIT licence as follows:
 
 ----- begin license block -----
 
-Copyright 2009 Jeremy Boles (http://jeremyboles.com/)
+Copyright 2011 Guillem Lorman (http://bajoelcocotero.com/)
+Copyright 2011 Solutions Nitriques
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

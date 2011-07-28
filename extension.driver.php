@@ -2,24 +2,31 @@
 
 Class extension_multilingual_field extends Extension {
 	protected $addedPublishHeaders = false;
-	
+
   // Simply outputs information to Symphony about the extension
   public function about() {
     $info = array(
       'author' => array(
-        'email' => 'guillem@bajoelcocotero.com',
-        'name' => 'Guillem Lorman',
-        'website' => 'http://bajoelcocotero.com/'
-      ),
+	     array(
+	        'email' => 'guillem@bajoelcocotero.com',
+	        'name' => 'Guillem Lorman',
+	        'website' => 'http://bajoelcocotero.com/'
+	      ),
+	      array(
+			'name'			=> 'Solutions Nitriques',
+			'website'		=> 'http://www.nitriques.com/open-source/',
+			'email'			=> 'open-source (at) nitriques.com'
+		)
+	  ),
       'name' => 'Field: Multilingual Text',
-      'release-date' => '2011-02-13',
-      'version' => '1.3'
+      'release-date' => '2011-07-27',
+      'version' => '1.4'
     );
-    
+
     return $info;
   }
-  	
- 
+
+
   // Creates the database to store all address fields
   public function install() {
 		return Symphony::Database()->query("CREATE TABLE `tbl_fields_multilingual` (
@@ -34,12 +41,12 @@ Class extension_multilingual_field extends Extension {
       KEY `field_id` (`field_id`)
     ) TYPE=MyISAM;");
   }
-  
+
   // Removes the database
   public function uninstall() {
 		Symphony::Database()->query("DROP TABLE `tbl_fields_multilingual`");
   }
-	
+
 	public function getSubscribedDelegates(){
 		return array(
 				array(
@@ -62,47 +69,49 @@ Class extension_multilingual_field extends Extension {
 		if(version_compare($previousVersion, '1.1', '<')){
 			foreach ($fields as $field) {
 				$entries_table = 'tbl_entries_data_'.$field["field_id"];
-				
+
 				if (!$this->updateHasColumn('value', $entries_table))
 					Symphony::Database()->query("ALTER TABLE `{$entries_table}` ADD COLUMN `value` TEXT DEFAULT NULL");
-				
-			}	
+
+			}
 		}
 
 		if(version_compare($previousVersion, '1.2', '<')){
 			foreach ($fields as $field) {
 				$entries_table = 'tbl_entries_data_'.$field["field_id"];
-				
+
 				$supported_language_codes = General::Sanitize(Symphony::Configuration()->get('language_codes', 'language_redirect'));
 				// Support for older versions of Language Redirect
 				if (empty($supported_language_codes)) {
 					$supported_language_codes = General::Sanitize(Symphony::Configuration()->get('language_codes', 'languages'));
 				}
-				
+
 				$supported_language_codes = preg_split('/\s*,\s*/', $supported_language_codes);
 
 				foreach ($supported_language_codes as $lang) {
 					if (!$this->updateHasColumn('handle-'.$lang, $entries_table)) {
 						Symphony::Database()->query("ALTER TABLE `{$entries_table}` ADD COLUMN `handle-{$lang}` TEXT DEFAULT NULL");
-						
 
-						$values = Symphony::Database()->fetch("SELECT `id`, `entry_id`, `value-{$lang}` FROM `{$entries_table}` WHERE `handle` IS NOT NULL"); 
+
+						$values = Symphony::Database()->fetch("SELECT `id`, `entry_id`, `value-{$lang}` FROM `{$entries_table}` WHERE `handle` IS NOT NULL");
 						foreach($values as $value) {
 							Symphony::Database()->query("UPDATE  `{$entries_table}` SET `handle-{$lang}` = '".$this->createHandle($value["value-".$lang], $value["entry_id"], $lang, $entries_table)."' WHERE id = ".$value["id"]);
 						}
-					}				
+					}
 
 				}
-				
-			}	
+
+			}
 		}
-	
+
+		// nothing to do for 1.3 nor 1.4
+
 		return true;
 	}
 
 	/*-------------------------------------------------------------------------*/
 	/* !Preferences: */
-	/*-------------------------------------------------------------------------*/	
+	/*-------------------------------------------------------------------------*/
 	public function appendPreferences($context){
 
 		$group = new XMLElement('fieldset');
@@ -123,13 +132,13 @@ Class extension_multilingual_field extends Extension {
 	}
 
 	public function __SavePreferences($context){
-	
+
 		// Support for older versions of Language Redirect
 		$language_codes = isset($_POST['settings']['language_redirect']['language_codes']) ? explode(',', $_POST['settings']['language_redirect']['language_codes']) : explode(',', $_POST['settings']['language_redirect']['languages']);
-	
+
 		$language_codes = array_map('trim', $language_codes);
 		$language_codes = array_filter($language_codes);
-		
+
 		$languages = $language_codes;
 
 		foreach ($languages as $language) {
@@ -143,11 +152,11 @@ Class extension_multilingual_field extends Extension {
 			// Foreach field check multilanguage values foreach language
 			foreach ($fields as $field) {
 				$entries_table = 'tbl_entries_data_'.$field["field_id"];
-	
+
 				$show_columns = Symphony::Database()->fetch("SHOW COLUMNS FROM `{$entries_table}` LIKE 'value-%'");
 				$columns = array();
-				
-				if ($show_columns) {					
+
+				if ($show_columns) {
 					foreach ($show_columns as $column) {
 						$language = substr($column['Field'], strlen($column['Field'])-2);
 
@@ -165,16 +174,16 @@ Class extension_multilingual_field extends Extension {
 
 				// Add new fields
 				foreach ($languages as $language) {
-					// If columna language dosen't exist in the laguange drop columns						
+					// If columna language dosen't exist in the laguange drop columns
 
 					if (!in_array('value-'.$language, $columns)) {
 						Symphony::Database()->query("ALTER TABLE  `{$entries_table}` ADD COLUMN `handle-{$language}` VARCHAR(255) DEFAULT NULL");
 						Symphony::Database()->query("ALTER TABLE  `{$entries_table}` ADD COLUMN `value-{$language}` TEXT DEFAULT NULL");
 						Symphony::Database()->query("ALTER TABLE  `{$entries_table}` ADD COLUMN `word_count-{$language}` INT(11) UNSIGNED DEFAULT NULL");
 						Symphony::Database()->query("ALTER TABLE  `{$entries_table}` ADD COLUMN `value_format-{$language}` TEXT DEFAULT NULL");
-					} 
+					}
 				}
-				
+
 			}
 		}
 
@@ -182,7 +191,7 @@ Class extension_multilingual_field extends Extension {
 
 	/*-------------------------------------------------------------------------*/
 	/* !Utilites: */
-	/*-------------------------------------------------------------------------*/	
+	/*-------------------------------------------------------------------------*/
 	public function addPublishHeaders($page) {
 		$callback = Administration::instance()->getPageCallback();
 		if ( ($callback['driver'] == 'publish') && ( $callback['context']['page'] == 'new' || $callback['context']['page'] == 'edit') ||	(( $callback['driver'] != 'publish' ) && $callback['driver'] != 'filter' )) {
@@ -190,7 +199,7 @@ Class extension_multilingual_field extends Extension {
 			if ($page and !$this->addedPublishHeaders) {
 				$page->addStylesheetToHead(URL . '/extensions/multilingual_field/assets/multilingual_field.publish.css', 'screen', 10251840);
 				$page->addScriptToHead(URL . '/extensions/multilingual_field/assets/multilingual_field.publish.js', 10251840);
-				
+
 				$this->addedPublishHeaders = true;
 			}
 
@@ -200,11 +209,11 @@ Class extension_multilingual_field extends Extension {
 	public function setMarkitUp($formatter) {
 		$Admin = Administration::instance();
 		$supported = Symphony::Configuration()->get('markitup');
-		
+
 		if ($supported) {
 			if (!isset($Admin->markitup)) $Admin->markitup = array();
 			array_push($Admin->markitup, $formatter);
-		
+
 		}
 		return $supported;
 	}
@@ -222,20 +231,20 @@ Class extension_multilingual_field extends Extension {
 	}
 
 	public function createHandle($value, $entry_id, $lang, $tbl) {
-				
+
 		$handle = Lang::createHandle(strip_tags(html_entity_decode($value)));
-		
+
 		if ($this->isHandleLocked($handle, $entry_id, $lang, $tbl)) {
 			$count = 2;
-				
+
 			while ($this->isHandleLocked("{$handle}-{$count}", $entry_id, $lang, $tbl)) $count++;
-					
+
 			return "{$handle}-{$count}";
 		}
-		
+
 		return $handle;
 	}
-	
+
 	public function isHandleLocked($handle, $entry_id, $lang, $tbl) {
 		return (boolean)Symphony::Database()->fetchVar('id', 0, sprintf(
 			"
@@ -252,7 +261,7 @@ Class extension_multilingual_field extends Extension {
 			(!is_null($entry_id) ? "AND f.entry_id != '{$entry_id}'" : '')
 		));
 	}
-	
+
 	public function getAddedPublishHeaders() {
 		return $this->addedPublishHeaders;
 	}
