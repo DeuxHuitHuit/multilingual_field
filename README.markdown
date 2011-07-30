@@ -1,12 +1,12 @@
 Multilingual Field Extension
 ============================
 
-* Version: 1.3
-* Author: Guillem Lorman (guillem@bajoelcocotero.com)
-* Build Date: 11 February 2011
+* Version: 1.4
+* Authors: Guillem Lorman (guillem@bajoelcocotero.com), Solutions Nitriques (open-source (at) nitriques.com)
+* Build Date: 27 July 2011
 * Requirements:  
 	- Symphony 2.1 or above
-	- Extension Language Redirect 1.0.1 by Jonas Coch (<http://github.com/klaftertief/language_redirect>)
+	- Extension Language Redirect 1.0.2 by Jonas Coch (<http://github.com/klaftertief/language_redirect>)
 
 - Based on TextBox Field extension by Rowan Lewis
 - Support WMDeditor extension by Doug Stewart
@@ -38,9 +38,14 @@ It's important to execute the Database updates.
 
 Changelog
 ----------
+- 1.4:
+ - Language Redirect 1.0.2 compatibily
+ - Refactor the create handle function: Allow duplicate just as the normal input field     
+ 	Use the Unique Field Extension to disallow duplicate entries
+
 - 1.3:
  - Symphony 2.2 compatibility
- - Language Redirect 1.0.1 compatibilyt
+ - Language Redirect 1.0.1 compatibily
  
 - 1.2:
  - Add multilingual handles to work with localized URL params
