@@ -7,13 +7,20 @@ Class extension_multilingual_field extends Extension {
   public function about() {
     $info = array(
       'author' => array(
-        'email' => 'guillem@bajoelcocotero.com',
-        'name' => 'Guillem Lorman',
-        'website' => 'http://bajoelcocotero.com/'
+		     array(
+		        'email' => 'guillem@bajoelcocotero.com',
+		        'name' => 'Guillem Lorman',
+		        'website' => 'http://bajoelcocotero.com/'
+		      ),
+		      array(
+						'name'			=> 'Solutions Nitriques',
+						'website'		=> 'http://www.nitriques.com/open-source/',
+						'email'			=> 'open-source (at) nitriques.com'
+					)
       ),
       'name' => 'Field: Multilingual Text',
-      'release-date' => '2011-02-13',
-      'version' => '1.3'
+      'release-date' => '2011-08-23',
+      'version' => '1.4'
     );
     
     return $info;
@@ -30,6 +37,7 @@ Class extension_multilingual_field extends Extension {
       `formatter` VARCHAR(255) DEFAULT NULL,
       `text_validator` VARCHAR(255) DEFAULT NULL,
       `text_length` INT(11) UNSIGNED DEFAULT 0,
+      `unique_handle` ENUM('yes','no') DEFAULT 'yes',
       PRIMARY KEY(`id`),
       KEY `field_id` (`field_id`)
     ) TYPE=MyISAM;");
@@ -97,6 +105,11 @@ Class extension_multilingual_field extends Extension {
 			}	
 		}
 	
+		// Add unique handle generation option
+		if(version_compare($previousVersion, '1.4', '<')){
+				Symphony::Database()->query("ALTER TABLE `tbl_fields_multilingual` ADD COLUMN `unique_handle` ENUM('yes','no') DEFAULT 'yes'");
+				Symphony::Database()->query("UPDATE  `tbl_fields_multilingual` SET `unique_handle` = 'yes'");
+		}
 		return true;
 	}
 

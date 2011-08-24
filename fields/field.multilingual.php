@@ -1,129 +1,15 @@
-<?php if (!defined('__IN_SYMPHONY__')) die('No direct script access.');
+<?php if (!defined('__IN_SYMPHONY__')) die('<h2>Symphony Error</h2><p>You cannot directly access this file</p>');
 	
 require_once(TOOLKIT . '/class.xsltprocess.php');
+require_once(EXTENSIONS . '/language_redirect/lib/class.languageredirect.php');
 
 Class fieldMultilingual extends Field {
   
 	protected $_sizes = array();
+	protected $_driver = null;
+	protected $_lang = array();
 	protected $_supported_language_codes = array();
 	protected $_current_language = array();
-	protected $_driver = null;
-
-	// I don't know those languages, so if You know for sure that browser uses different code,
-	// or that native name should be different, please let me know about that :).
-	// It would also be great, if whole string could be in native form, including name of country.
-	public $_lang = array(						// [English name]
-		'ab' => 'аҧсуа бызшәа',					// Abkhazian
-		'af' => 'Afrikaans',					// Afrikaans
-		'sq' => 'Shqip',						// Albanian
-		'am' => 'አማርኛ',							// Amharic
-		'ar' => 'العربية',			// Arabic
-		'hy' => 'Հայերեն',						// Armenian
-		'as' => 'অসমীয়া',							// Assamese
-		'az' => 'Azərbaycan',					// Azeri
-		'eu' => 'Euskera',						// Basque
-		'be' => 'Беларуская',					// Belarusian
-		'bn' => 'বাংলা',							// Bengali
-		'bg' => 'Български',					// Bulgarian
-		'ca' => 'Català',						// Catalan
-		'zh' => '中文',							// Chinese
-		'hr' => 'Hrvatski',						// Croatian
-		'cs' => 'čeština',						// Czech
-		'da' => 'Dansk',						// Danish
-		'dv' => 'ދިވެހި',							// Divehi
-		'nl' => 'Nederlands (Netherlands)',		// Dutch
-		'en' => 'English',						// English
-		'ee' => 'Ɛʋɛ',							// Ewe
-		'et' => 'Eesti',						// Estonian
-		'fo' => 'føroyskt',						// Faeroese
-		'fa' => 'فارسی',						// Farsi
-		'fi' => 'Suomi',						// Finnish
-		'fr' => 'Français',						// French
-		'ff' => 'Fulfulde, Pulaar, Pular',		// Fula, Fulah, Fulani
-		'gl' => 'Galego',						// Galician
-		'gd' => 'Gàidhlig',						// Gaelic (Scottish)
-		'ga' => 'Gaeilge',						// Gaelic (Irish)
-		'gv' => 'Gaelg',						// Gaelic (Manx) (Isle of Man)
-		'ka' => 'ქართული ენა',					// Georgian
-		'de' => 'Deutsch',						// German
-		'el' => 'Ελληνικά',						// Greek
-		'gu' => 'ગુજરાતી',							// Gujarati
-		'ha' => 'هَوْسَ',							// Hausa
-		'he' => 'עברית',						// Hebrew
-		'hi' => 'हिंदी',							// Hindi
-		'hu' => 'Magyar',						// Hungarian
-		'is' => 'Íslenska',						// Icelandic
-		'id' => 'Bahasa Indonesia',				// Indonesian
-		'it' => 'Italiano',						// Italian
-		'ja' => '日本語',							// Japanese
-		'kn' => 'ಕನ್ನಡ',						// Kannada
-		'kk' => 'Қазақ',						// Kazakh
-		'rw' => 'Kinyarwanda',					// Kinyarwanda
-		'kok' => 'कोंकणी',							// Konkani
-		'ko' => '한국어/조선말',					// Korean
-		'kz' => 'Кыргыз',						// Kyrgyz
-		'lv' => 'Latviešu',						// Latvian
-		'lt' => 'Lietuviškai',					// Lithuanian
-		'luo'=> 'Dholuo',						// Luo
-		'ms' => 'Bahasa Melayu',				// Malay
-		'mk' => 'Македонски',					// Macedonian
-		'ml' => 'മലയാളം',							// Malayalam
-		'mt' => 'Malti',						// Maltese
-		'mr' => 'मराठी',							// Marathi
-		'mn' => 'Монгол',						// Mongolian  (Cyrillic)
-		'ne' => 'नेपाली',							// Nepali
-		'nb' => 'Norsk bokmål',					// Norwegian Bokmål
-		'nn' => 'Norsk nynorsk',				// Norwegian Nynorsk
-		'no' => 'Norsk',						// Norwegian
-		'or' => 'ଓଡ଼ିଆ',							// Oriya
-		'ps' => 'پښتو',						// Pashto
-		'pl' => 'polski',						// Polish
-		'pt-br' => 'português brasileiro',		// Portuguese (Brasil)
-		'pt' => 'português',					// Portuguese
-		'pa' => 'پنجابی/ਪੰਜਾਬੀ',					// Punjabi
-		'qu' => 'Runa Simi/Kichwa',				// Quechua
-		'rm' => 'Romansch',						// Rhaeto-Romanic
-		'ro' => 'Română',						// Romanian
-		'rn' => 'kiRundi', 						// Rundi
-		'ru' => 'Pyccĸий',						// Russian
-		'sg' => 'yângâ tî sängö',				// Sango
-		'sa' => 'संस्कृतम्',							// Sanskrit
-		'sc' => 'sardu',						// Sardinian
-		'sr' => 'Srpski/српски',				// Serbian
-		'sn' => 'chiShona',						// Shona
-		'ii' => 'ꆇꉙ',							// Sichuan Yi
-		'si' => 'සිංහල',						// Sinhalese, Sinhala
-		'sk' => 'Slovenčina',					// Slovak
-		'ls' => 'Slovenščina',					// Slovenian
-		'so' => 'Soomaaliga/af Soomaali',		// Somali
-		'st' => 'Sesotho',						// Sotho, Sutu
-		'es' => 'Español',						// Spanish
-		'sw' => 'Kiswahili',					// Swahili
-		'sv' => 'Svenska',						// Swedish
-		'syr' => 'ܣܘܪܝܝܐ',						// Syriac
-		'ta' => 'தமிழ்',							// Tamil
-		'tt' => 'татарча/تاتارچا',				// Tatar
-		'te' => 'తెలుగు',							// Telugu
-		'th' => 'ภาษาไทย',						// Thai
-		'ti' => 'ትግርኛ',							// Tigrinya
-		'ts' => 'Xitsonga',						// Tsonga
-		'tn' => 'Setswana',						// Tswana
-		'tr' => 'Türkçe',						// Turkish
-		'tk' => 'Түркмен',						// Turkmen
-		'ug' => 'ئۇيغۇرچە‎/Uyƣurqə/Уйғурчә',	// Uighur, Uyghur
-		'uk' => 'Українська',					// Ukrainian
-		'ur' => 'اردو',							// Urdu
-		'uz' => 'o\'zbek',						// Uzbek
-		've' => 'Tshivenḓa',					// Venda
-		'vi' => 'Tiếng Việt',					// Vietnamese
-		'wa' => 'walon',						// Waloon
-		'cy' => 'Cymraeg',						// Welsh
-		'wo' => 'Wolof',						// Wolof
-		'xh' => 'isiXhosa',						// Xhosa
-		'yi' => 'ייִדיש',						// Yiddish
-		'yo' => 'Yorùbá',						// Yoruba
-		'zu' => 'isiZulu',						// Zulu
-	);
 
 	/*------------------------------------------------------------------------- */
 	/* !Definition: */
@@ -137,14 +23,15 @@ Class fieldMultilingual extends Field {
 
 
 		// Get supported languages
-		$this->_supported_language_codes = $this->getSupportedLanguageCodes();
+		$this->_lang = LanguageRedirect::instance()->getAllLanguages();
+		$this->_supported_language_codes = LanguageRedirect::instance()->getSupportedLanguageCodes();
 		$this->_current_language = $this->getCurrentLanguage();
 
 		// Set defaults:
 		$this->set('show_column', 'yes');
 		$this->set('size', 'medium');
 		$this->set('required', 'yes');		
-
+		
 		$this->_sizes = array(
 			array('single', false, __('Single Line')),
 			array('small', false, __('Small Box')),
@@ -153,6 +40,10 @@ Class fieldMultilingual extends Field {
 			array('huge', false, __('Huge Box'))
 		);
   }
+
+	public function findDefaults(&$fields){
+		if(!isset($fields['unique_handle'])) $fields['unique_handle'] = 'yes';
+	}
   
   public function commit() {
 
@@ -161,7 +52,7 @@ Class fieldMultilingual extends Field {
     $id = $this->get('id');
     $handle = $this->handle();
     if ($id === false) { return false; }
-
+//var_dump($this->get('unique_handle'));
 		$fields = array(
 			'field_id'			=> $id,
 			'column_length'		=> (
@@ -176,7 +67,8 @@ Class fieldMultilingual extends Field {
 				(integer)$this->get('text_length') > 0
 				? $this->get('text_length')
 				: 0
-			)
+			),
+			'unique_handle' => $this->get('unique_handle') == 'yes' ? 'yes' : 'no'
 		);
 		
 		Symphony::Database()->query("
@@ -245,39 +137,22 @@ Class fieldMultilingual extends Field {
 		if (empty($lang)) $lang = $this->_supported_language_codes[0];
 		
 		$handle = Lang::createHandle(strip_tags(html_entity_decode($value)));
+
+		if ($this->get('unique_handle') == 'yes') {
 		
-		if ($this->isHandleLocked($handle, $entry_id, $lang)) {
-			if ($this->isHandleFresh($handle, $value, $entry_id,$lang)) {
-				return $this->getCurrentHandle($entry_id,$lang);
-			}
-			
-			else {
+			if ($this->isHandleLocked($handle, $entry_id, $lang)) {
 				$count = 2;
 					
-					while ($this->isHandleLocked("{$handle}-{$count}", $entry_id, $lang)) $count++;
+				while ($this->isHandleLocked("{$handle}-{$count}", $entry_id, $lang)) $count++;
 					
-				return "{$handle}-{$count}";
+				$handle = "{$handle}-{$count}";
 			}
+			
 		}
-		
+
 		return $handle;
 	}
-	
-	public function getCurrentHandle($entry_id, $lang) {
-		return Symphony::Database()->fetchVar('handle-{$lang}', 0, sprintf(
-			"
-				SELECT
-					f.`handle-{$lang}`
-				FROM
-					`tbl_entries_data_%s` AS f
-				WHERE
-					f.entry_id = '%s'
-				LIMIT 1
-			",
-			$this->get('id'), $entry_id
-		));
-	}
-	
+		
 	public function isHandleLocked($handle, $entry_id, $lang) {
 		return (boolean)Symphony::Database()->fetchVar('id', 0, sprintf(
 			"
@@ -294,32 +169,7 @@ Class fieldMultilingual extends Field {
 			(!is_null($entry_id) ? "AND f.entry_id != '{$entry_id}'" : '')
 		));
 	}
-	
-	public function isHandleFresh($handle, $value, $entry_id, $lang) {
-		return (boolean)Symphony::Engine()->Database->fetchVar('id', 0, sprintf(
-			"
-				SELECT
-					f.id
-				FROM
-					`tbl_entries_data_%s` AS f
-				WHERE
-					f.entry_id = '%s'
-					AND f.`value-{$lang}` = '%s'
-				LIMIT 1
-			",
-			$this->get('id'), $entry_id,
-			$this->cleanValue(General::sanitize($value))
-		));
-	}
-
-	public function getSupportedLanguageCodes() {
-		$supported_language_codes = explode(',', General::Sanitize(Symphony::Configuration()->get('language_codes', 'language_redirect')));
-		$supported_language_codes = array_map('trim', $supported_language_codes);
-		$supported_language_codes = array_filter($supported_language_codes);
-
-		return $supported_language_codes;
-	}
-	
+		
 	public function getCurrentLanguage() {
 		$authorLang = '';
 		
@@ -331,8 +181,10 @@ Class fieldMultilingual extends Field {
 			}
 		}
 		
-		if (!empty($_REQUEST['language']) && in_array($_REQUEST['language'], $this->_supported_language_codes)) {
-			return $_REQUEST['language'];
+		$lang = LanguageRedirect::instance()->getLanguageCode();
+
+		if (!empty($lang)) {
+			return $lang;
 		}
 		else if (!empty($authorLang) && in_array($authorLang, $this->_supported_language_codes)) {
 			return $authorLang;
@@ -439,15 +291,36 @@ Class fieldMultilingual extends Field {
 		));
 
 		$wrapper->appendChild($group);
-		
+
+		/* Current Languages */ 
 		$group = new XMLElement('div');
 		$group->setAttribute('class', 'group');
 
 		$group->appendChild(Widget::Label(
-			__('Current supported languages: ').implode(',',$this->_supported_language_codes)
+			__('Current supported languages: ') . implode(',',$this->_supported_language_codes)
 		));
 
 		$wrapper->appendChild($group);
+		
+		/* Create unique handles */
+		$group = new XMLElement('div');
+		$group->setAttribute('class', 'group');
+
+		$input = Widget::Input(
+			"fields[{$order}][unique_handle]",
+			'yes',
+			'checkbox'
+		);
+		if ($this->get('unique_handle') == 'yes') {
+			$input->setAttribute('checked', 'checked');
+		}
+		
+		$group->appendChild(Widget::Label(
+			$input->generate() . ' ' . __('Create unique handles')
+		));
+
+		$wrapper->appendChild($group);
+				
 		/* Defaults */
 		
 		$this->appendRequiredCheckbox($wrapper);
@@ -699,25 +572,29 @@ Class fieldMultilingual extends Field {
 		$result = array();
 		$entry_data = array();
 		
+		// if an entry_id is passed, get all the current data from the DB
 		if (!empty($entry_id)) {
 			$field_id = $this->get('id');
 			$entry_data = Symphony::Database()->fetchRow(0, "SELECT * FROM `tbl_entries_data_{$field_id}` WHERE `entry_id` = {$entry_id}");
 		}
 		
+		// If we have a submitted value
 		if (!empty($data['value-'.$this->_supported_language_codes[0]])) {
 			$result['value'] = $data['value-'.$this->_supported_language_codes[0]];
 		
 			if ($this->get('text_size') == 'single')
 				$result['handle'] = $this->createHandle($result['value'], $entry_id);
-		} else {
+		} else { // use data from the DB
 			$result['value'] = $entry_data['value-'.$this->_supported_language_codes[0]];
 		
 			if ($this->get('text_size') == 'single')
 				$result['handle'] = $this->createHandle($entry_data['value'], $entry_id);
 		}
 		
+		// for each supported languages
 		foreach ($this->_supported_language_codes as $language) {
 		
+			// check if data was set from submit
 			if (isset($data['value-'.$language])) {
 				if ($this->get('text_size') == 'single') {
 					$result['handle-'.$language] = $this->createHandle($data['value-'.$language], $entry_id, $language);
@@ -726,7 +603,7 @@ Class fieldMultilingual extends Field {
 				$result['value-'.$language] = $data['value-'.$language];
 				$result['word_count-'.$language] = General::countWords($data['value-'.$language]);
 				$result['value_format-'.$language] = $this->applyFormatting($data['value-'.$language]);
-			} else {
+			} else { // use data in DB
 				if ($this->get('text_size') == 'single') {
 					$result['handle-'.$language] = $this->createHandle($entry_data['value-'.$language], $entry_id, $language);
 				}
@@ -737,6 +614,7 @@ Class fieldMultilingual extends Field {
 			}
 		}
 		
+		// return array that will be inserted
 		return $result;
 	}
 	
