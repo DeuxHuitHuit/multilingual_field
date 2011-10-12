@@ -1,7 +1,7 @@
 Multilingual Field Extension
 ============================
 
-* Version: 1.4
+* Version: 1.4.1
 * Authors: Guillem Lorman (guillem@bajoelcocotero.com), Solutions Nitriques (open-source (at) nitriques.com)
 * Build Date: 27 July 2011
 * Requirements:  
@@ -38,6 +38,9 @@ It's important to execute the Database updates.
 
 Changelog
 ----------
+- 1.4.1:
+ - Add an option to the fields definition to set if field has to show the values of default language when the value of selected language is empty.
+
 - 1.4:
  - Language Redirect 1.0.2 compatibily
  - Add an option to the fields definition to make optional to generate or not unique handles.

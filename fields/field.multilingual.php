@@ -43,6 +43,7 @@ Class fieldMultilingual extends Field {
 
 	public function findDefaults(&$fields){
 		if(!isset($fields['unique_handle'])) $fields['unique_handle'] = 'yes';
+		if(!isset($fields['use_def_lang_vals'])) $fields['use_def_lang_vals'] = 'yes';
 	}
   
   public function commit() {
@@ -68,7 +69,8 @@ Class fieldMultilingual extends Field {
 				? $this->get('text_length')
 				: 0
 			),
-			'unique_handle' => $this->get('unique_handle') == 'yes' ? 'yes' : 'no'
+			'unique_handle' => $this->get('unique_handle') == 'yes' ? 'yes' : 'no',
+			'use_def_lang_vals' => $this->get('use_def_lang_vals') == 'yes' ? 'yes' : 'no'
 		);
 		
 		Symphony::Database()->query("
@@ -317,6 +319,19 @@ Class fieldMultilingual extends Field {
 		
 		$group->appendChild(Widget::Label(
 			$input->generate() . ' ' . __('Create unique handles')
+		));
+
+		$input = Widget::Input(
+			"fields[{$order}][use_def_lang_vals]",
+			'yes',
+			'checkbox'
+		);
+		if ($this->get('use_def_lang_vals') == 'yes') {
+			$input->setAttribute('checked', 'checked');
+		}
+		
+		$group->appendChild(Widget::Label(
+			$input->generate() . ' ' . __('Use values of default language when if selected language has empty value')
 		));
 
 		$wrapper->appendChild($group);
@@ -655,6 +670,13 @@ Class fieldMultilingual extends Field {
 			$data['value_formatted'] = $data['value_format-'.$language];
 			$data['word_count'] = $data['word_count-'.$language];
 			
+			// If value is empty for this language, load value of default language
+			if ($this->get('use_def_lang_vals') == 'yes' && $data['value'] == '') {
+				$data['value'] = $data['value-'.$this->_supported_language_codes[0]];
+				$data['value_formatted'] = $data['value_format-'.$this->_supported_language_codes[0]];
+				$data['word_count'] = $data['word_count-'.$this->_supported_language_codes[0]];
+			}
+
 			if ($mode == 'raw') {
 				$value = trim($data['value']);
 			}

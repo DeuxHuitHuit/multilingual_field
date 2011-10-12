@@ -20,7 +20,7 @@ Class extension_multilingual_field extends Extension {
       ),
       'name' => 'Field: Multilingual Text',
       'release-date' => '2011-08-23',
-      'version' => '1.4'
+      'version' => '1.4.1'
     );
     
     return $info;
@@ -38,6 +38,7 @@ Class extension_multilingual_field extends Extension {
       `text_validator` VARCHAR(255) DEFAULT NULL,
       `text_length` INT(11) UNSIGNED DEFAULT 0,
       `unique_handle` ENUM('yes','no') DEFAULT 'yes',
+      `use_def_lang_vals` ENUM('yes','no') DEFAULT 'yes',
       PRIMARY KEY(`id`),
       KEY `field_id` (`field_id`)
     ) TYPE=MyISAM;");
@@ -109,6 +110,12 @@ Class extension_multilingual_field extends Extension {
 		if(version_compare($previousVersion, '1.4', '<')){
 				Symphony::Database()->query("ALTER TABLE `tbl_fields_multilingual` ADD COLUMN `unique_handle` ENUM('yes','no') DEFAULT 'yes'");
 				Symphony::Database()->query("UPDATE  `tbl_fields_multilingual` SET `unique_handle` = 'yes'");
+		}
+
+		// Add use defalut language values option
+		if(version_compare($previousVersion, '1.4.1', '<')){
+				Symphony::Database()->query("ALTER TABLE `tbl_fields_multilingual` ADD COLUMN `use_def_lang_vals` ENUM('yes','no') DEFAULT 'yes'");
+				Symphony::Database()->query("UPDATE  `tbl_fields_multilingual` SET `use_def_lang_vals` = 'yes'");
 		}
 		return true;
 	}
