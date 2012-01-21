@@ -531,7 +531,17 @@ Class fieldMultilingual extends Field {
 		$message = null;
 		
 		foreach ($this->_supported_language_codes as $language) {
-			$value = $data['value-'.$language];
+			// strip tags
+			$value = strip_tags($data['value-'.$language]);
+			// convert decimal entities
+			$value = preg_replace_callback(
+				"/(&#[0-9]+;)/",
+				create_function(
+					'$m',
+					'return mb_convert_encoding($m[1], "UTF-8", "HTML-ENTITIES");'
+				),
+				$value
+			);
 				
 			if ($this->get('required') == 'yes' and strlen(trim($value)) == 0) {
 				$message = __(
