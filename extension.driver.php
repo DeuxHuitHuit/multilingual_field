@@ -164,7 +164,15 @@ Class extension_multilingual_field extends Extension {
 			foreach ($fields as $field) {
 				$entries_table = 'tbl_entries_data_'.$field["field_id"];
 	
-				$show_columns = Symphony::Database()->fetch("SHOW COLUMNS FROM `{$entries_table}` LIKE 'value-%'");
+				try{
+					$show_columns = Symphony::Database()->fetch("SHOW COLUMNS FROM `{$entries_table}` LIKE 'value-%'");
+				}
+				catch(DatabaseException $dbe){
+					// Field doesn't exist. Better remove it's settings
+					Symphony::Database()->query("DELETE FROM `tbl_fields_multilingual` WHERE `field_id` = ".$field["field_id"].";");
+					continue;
+				}
+				
 				$columns = array();
 				
 				if ($show_columns) {					
