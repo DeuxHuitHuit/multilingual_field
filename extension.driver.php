@@ -39,7 +39,7 @@
 					`def_ref_lang` ENUM('yes','no') DEFAULT 'no',
 					PRIMARY KEY (`id`),
 					KEY `field_id` (`field_id`)
-				) ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+				) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;",
 				self::FIELD_TABLE
 			));
 
