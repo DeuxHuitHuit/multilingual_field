@@ -242,6 +242,11 @@
 					$input = Widget::Input(
 						"fields{$prefix}[$element_name]{$postfix}[{$lc}]", General::sanitize($data['value-'.$lc])
 					);
+
+					###
+					# Delegate: ModifyTextBoxInlineFieldPublishWidget
+					# Description: Allows developers modify the textbox before it is rendered in the publish forms
+					$delegate = 'ModifyTextBoxInlineFieldPublishWidget';
 				}
 
 				// Text Box:
@@ -249,6 +254,11 @@
 					$input = Widget::Textarea(
 						"fields{$prefix}[$element_name]{$postfix}[{$lc}]", 20, 50, General::sanitize($data['value-'.$lc])
 					);
+
+					###
+					# Delegate: ModifyTextBoxFullFieldPublishWidget
+					# Description: Allows developers modify the textbox before it is rendered in the publish forms
+					$delegate = 'ModifyTextBoxFullFieldPublishWidget';
 				}
 
 				// Add classes:
@@ -262,6 +272,16 @@
 					'class' => implode(' ', $classes),
 					'length' => (integer)$this->get('text_length')
 				));
+
+				Symphony::ExtensionManager()->notifyMembers(
+					$delegate, '/backend/',
+					array(
+						'field' => $this,
+						'label' => $div,
+						'input' => $input,
+						'textarea' => $input
+					)
+				);
 
 				$div->appendChild($input);
 
