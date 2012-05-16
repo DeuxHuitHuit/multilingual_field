@@ -47,86 +47,107 @@
 		}
 
 		public function update($prev_version){
-			$fields = Symphony::Database()->fetch(sprintf("SELECT field_id FROM `%s`", self::FIELD_TABLE));
-
-			if( version_compare($prev_version, '1.1', '<') ){
-				foreach( $fields as $field ){
-					$entries_table = 'tbl_entries_data_'.$field["field_id"];
-
-					if( !$this->updateHasColumn('value', $entries_table) )
-						Symphony::Database()->query("ALTER TABLE `{$entries_table}` ADD COLUMN `value` TEXT DEFAULT NULL");
-
-				}
-			}
-
-			if( version_compare($prev_version, '1.2', '<') ){
-				foreach( $fields as $field ){
-					$entries_table = 'tbl_entries_data_'.$field["field_id"];
-
-					foreach( FLang::getLangs() as $lc ){
-						if( !$this->updateHasColumn('handle-'.$lc, $entries_table) ){
-							Symphony::Database()->query("ALTER TABLE `{$entries_table}` ADD COLUMN `handle-{$lc}` TEXT DEFAULT NULL");
-
-							$values = Symphony::Database()->fetch("SELECT `id`, `entry_id`, `value-{$lc}` FROM `{$entries_table}` WHERE `handle` IS NOT NULL");
-							foreach( $values as $value ){
-								Symphony::Database()->query("UPDATE  `{$entries_table}` SET `handle-{$lc}` = '".$this->__createHandle($value["value-".$lc], $value["entry_id"], $lc, $entries_table)."' WHERE id = ".$value["id"]);
-							}
-						}
-
-					}
-
-				}
-			}
-
-			if( version_compare($prev_version, '1.4', '<') ){
-				Symphony::Database()->query(sprintf("ALTER TABLE `%s` ADD COLUMN `unique_handle` ENUM('yes','no') DEFAULT 'yes'", self::FIELD_TABLE));
-				Symphony::Database()->query(sprintf("UPDATE `%s` SET `unique_handle` = 'yes'", self::FIELD_TABLE));
-			}
-
-			if( version_compare($prev_version, '1.4.1', '<') ){
-				Symphony::Database()->query(sprintf("ALTER TABLE `%s` ADD COLUMN `use_def_lang_vals` ENUM('yes','no') DEFAULT 'yes'", self::FIELD_TABLE));
-				Symphony::Database()->query(sprintf("UPDATE `%s` SET `use_def_lang_vals` = 'yes'", self::FIELD_TABLE));
-			}
-
 			if( version_compare($prev_version, '2.0', '<') ){
-				Symphony::Database()->query(sprintf(
-					"RENAME TABLE `tbl_fields_multilingual` TO `%s`;",
-					self::FIELD_TABLE
-				));
+				$v1x_table = 'tbl_fields_multilingual';
 
-				Symphony::Database()->query(sprintf(
-					"ALTER TABLE `%s`
-						CHANGE COLUMN formatter text_formatter,
-						CHANGE COLUMN unique_handle text_handle,
-						CHANGE COLUMN use_def_lang_vals def_ref_lang ENUM('yes','no') DEFAULT 'no',
-						ADD COLUMN `text_cdata` ENUM('yes', 'no') DEFAULT 'no';",
-					self::FIELD_TABLE
-				));
+				$fields = Symphony::Database()->fetch(sprintf("SELECT field_id FROM `%s`", $v1x_table));
 
-				Symphony::Database()->query(sprintf(
-					"UPDATE  `%s` SET `text_cdata` = 'no'",
-					self::FIELD_TABLE
-				));
+				if( version_compare($prev_version, '1.1', '<') ){
+					foreach( $fields as $field ){
+						$entries_table = 'tbl_entries_data_'.$field["field_id"];
+
+						if( !$this->updateHasColumn('value', $entries_table) )
+							Symphony::Database()->query("ALTER TABLE `{$entries_table}` ADD COLUMN `value` TEXT DEFAULT NULL");
+
+					}
+				}
+
+				if( version_compare($prev_version, '1.2', '<') ){
+					foreach( $fields as $field ){
+						$entries_table = 'tbl_entries_data_'.$field["field_id"];
+
+						foreach( FLang::getLangs() as $lc ){
+							if( !$this->updateHasColumn('handle-'.$lc, $entries_table) ){
+								Symphony::Database()->query("ALTER TABLE `{$entries_table}` ADD COLUMN `handle-{$lc}` TEXT DEFAULT NULL");
+
+								$values = Symphony::Database()->fetch("SELECT `id`, `entry_id`, `value-{$lc}` FROM `{$entries_table}` WHERE `handle` IS NOT NULL");
+								foreach( $values as $value ){
+									Symphony::Database()->query("UPDATE  `{$entries_table}` SET `handle-{$lc}` = '".$this->__createHandle($value["value-".$lc], $value["entry_id"], $lc, $entries_table)."' WHERE id = ".$value["id"]);
+								}
+							}
+
+						}
+
+					}
+				}
+
+				if( version_compare($prev_version, '1.4', '<') ){
+					Symphony::Database()->query(sprintf("ALTER TABLE `%s` ADD COLUMN `unique_handle` ENUM('yes','no') DEFAULT 'yes'", $v1x_table));
+					Symphony::Database()->query(sprintf("UPDATE `%s` SET `unique_handle` = 'yes'", $v1x_table));
+				}
+
+				if( version_compare($prev_version, '1.4.1', '<') ){
+					Symphony::Database()->query(sprintf("ALTER TABLE `%s` ADD COLUMN `use_def_lang_vals` ENUM('yes','no') DEFAULT 'yes'", $v1x_table));
+					Symphony::Database()->query(sprintf("UPDATE `%s` SET `use_def_lang_vals` = 'yes'", $v1x_table));
+				}
+
+				if( version_compare($prev_version, '2.0', '<') ){
+					Symphony::Database()->query(sprintf(
+						"RENAME TABLE `%s` TO `%s`;",
+						$v1x_table, self::FIELD_TABLE
+					));
+
+					Symphony::Database()->query(sprintf(
+						"UPDATE `tbl_fields` SET `type` = '%s' WHERE `type` = '%s'",
+						'multilingual_textbox', 'multilingual'
+					));
+
+					Symphony::Database()->query(sprintf(
+						"ALTER TABLE `%s`
+							CHANGE `formatter` `text_formatter` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+							CHANGE `unique_handle` `text_handle` ENUM('yes', 'no') CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT 'yes',
+							CHANGE `use_def_lang_vals` `def_ref_lang`  ENUM('yes', 'no') CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT 'no',
+							MODIFY `text_validator` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+							MODIFY `text_size` ENUM('single', 'small', 'medium', 'large', 'huge') CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT 'medium',
+							ADD `text_cdata` ENUM('yes', 'no') CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT 'no';",
+						self::FIELD_TABLE
+					));
+
+					Symphony::Database()->query(sprintf(
+						"UPDATE  `%s` SET `text_cdata` = 'no'",
+						self::FIELD_TABLE
+					));
 
 
-				foreach( $fields as $field ){
-					$entries_table = 'tbl_entries_data_'.$field["field_id"];
+					foreach( $fields as $field ){
+						$entries_table = 'tbl_entries_data_'.$field["field_id"];
 
-					foreach( FLang::getLangs() as $lc ){
-						if( !$this->updateHasColumn('value_formatted-'.$lc, $entries_table) ){
-							Symphony::Database()->query(sprintf(
-								'ALTER TABLE `%1$s`
-									CHANGE COLUMN value_format-%2$s value_formatted-%2$s TEXT DEFAULT NULL,
-									ADD FULLTEXT KEY `value-%2$s` (value-%2$s),
-									ADD FULLTEXT KEY `value_formatted-%2$s` (value_formatted-%2$s);',
-								$entries_table, $lc
-							));
+						Symphony::Database()->query(sprintf(
+							'ALTER TABLE `%1$s`
+								MODIFY `handle` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+								MODIFY `value` TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL;',
+							$entries_table
+						));
+
+						foreach( FLang::getLangs() as $lc ){
+							if( !$this->updateHasColumn('value_formatted-'.$lc, $entries_table) ){
+								Symphony::Database()->query(sprintf(
+									'ALTER TABLE `%1$s`
+										CHANGE COLUMN `value_format-%2$s` `value_formatted-%2$s` CHARACTER SET utf8 COLLATE utf8_unicode_ci TEXT DEFAULT NULL,
+										MODIFY `handle-%2$s` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+										MODIFY `value-%2$s` TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+										MODIFY `word_count-%2$s` INT(11) UNSIGNED CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+										ADD FULLTEXT KEY `value-%2$s` (value-%2$s),
+										ADD FULLTEXT KEY `value_formatted-%2$s` (value_formatted-%2$s);',
+									$entries_table, $lc
+								));
+							}
+
 						}
 
 					}
 
 				}
-
 			}
 
 			return true;
