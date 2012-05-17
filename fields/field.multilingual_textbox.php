@@ -165,7 +165,7 @@
 					`def_ref_lang` = '%s'
 				WHERE
 					`field_id` = '%s';",
-				$this->handle(), $this->get('def_ref_lang'), $this->get('id')
+				$this->handle(), $this->get('def_ref_lang') === 'yes' ? 'yes': 'no', $this->get('id')
 			));
 		}
 
@@ -486,5 +486,12 @@
 			return $groups;
 		}
 
+
+
+		/*------------------------------------------------------------------------------------------------*/
+		/*  Field schema  */
+		/*------------------------------------------------------------------------------------------------*/
+
+		public function appendFieldSchema($f){}
 
 	}
