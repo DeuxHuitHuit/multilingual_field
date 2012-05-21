@@ -384,9 +384,10 @@
 
 			$elem = $wrapper->getChildByName($this->get('element_name'), 0);
 
-			foreach( FLang::getLangs() as $lc ){
-				$elem->setAttribute("handle-{$lc}", $data["handle-{$lc}"]);
-			}
+			if( !is_null($elem) )
+				foreach( FLang::getLangs() as $lc ){
+					$elem->setAttribute("handle-{$lc}", $data["handle-{$lc}"]);
+				}
 		}
 
 		public function prepareTableValue($data, XMLElement $link = null){
