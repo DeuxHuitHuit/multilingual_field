@@ -409,14 +409,11 @@
 			$lang_code = FLang::getLangCode();
 
 			// If value is empty for this language, load value from main language
-			if( $this->get('def_ref_lang') == 'yes' && $data['handle-'.$lang_code] === '' ){
+			if( $this->get('def_ref_lang') === 'yes' && $data['value-'.$lang_code] === '' ){
 				$lang_code = FLang::getMainLang();
 			}
 
-			$data['value'] = $data['value-'.$lang_code];
-			$data['handle'] = $data['handle-'.$lang_code];
-
-			return parent::getParameterPoolValue($data);
+			return $data['value-'.$lang_code];
 		}
 
 		public function getExampleFormMarkup(){
