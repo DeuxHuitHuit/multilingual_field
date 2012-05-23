@@ -129,9 +129,10 @@
 		/*------------------------------------------------------------------------------------------------*/
 
 		public function findDefaults(&$fields){
-			$fields['def_ref_lang'] = 'no';
+			parent::findDefaults($fields);
 
-			return parent::findDefaults($fields);
+			$fields['def_ref_lang'] = 'no';
+			$fields['text_handle'] = 'no';
 		}
 
 		public function displaySettingsPanel(XMLElement &$wrapper, $errors = null){
