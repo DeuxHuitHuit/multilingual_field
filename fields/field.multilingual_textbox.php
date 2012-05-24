@@ -132,7 +132,6 @@
 			parent::findDefaults($fields);
 
 			$fields['def_ref_lang'] = 'no';
-			$fields['text_handle'] = 'no';
 		}
 
 		public function displaySettingsPanel(XMLElement &$wrapper, $errors = null){
