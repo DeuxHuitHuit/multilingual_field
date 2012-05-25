@@ -1,7 +1,7 @@
 ;(function($, undefined){
 
 	$(document).ready(function() {
-		$('div.field-multilingual-textbox').each(function() {
+		$('div.field-multilingual_textbox').each(function() {
 			var $field = $(this);
 
 			var update = function(e) {
