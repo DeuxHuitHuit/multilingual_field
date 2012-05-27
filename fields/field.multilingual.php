@@ -425,7 +425,7 @@ Class fieldMultilingual extends Field {
 			// Textarea:
 			else {
 				$input = Widget::Textarea(
-					"fields{$prefix}[$element_name]{$postfix}[value-".$language."]", '20', '50', General::sanitize($data['value-'.$language])
+					"fields{$prefix}[$element_name]{$postfix}[value-".$language."]", 20, 50, General::sanitize($data['value-'.$language])
 				);
 				
 				###
@@ -457,7 +457,7 @@ Class fieldMultilingual extends Field {
 				###
 				# Delegate: ModifyTextareaFieldPublishWidget
 				# Description: Allows developers modify the textarea before it is rendered in the publish forms
-				$this->_engine->ExtensionManager->notifyMembers(
+                ExtensionManager::notifyMembers(
 					'ModifyTextareaFieldPublishWidget', 
 					'/backend/', 
 					array(
@@ -469,7 +469,7 @@ Class fieldMultilingual extends Field {
 				###
 				# Delegate: ModifyTextBoxFullFieldPublishWidget
 				# Description: Allows developers modify the textbox before it is rendered in the publish forms
-				$this->_engine->ExtensionManager->notifyMembers(
+                ExtensionManager::notifyMembers(
 					$delegate, '/backend/',
 					array(
 						'field'		=> &$this,
