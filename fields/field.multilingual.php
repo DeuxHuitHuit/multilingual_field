@@ -15,30 +15,30 @@ Class fieldMultilingual extends Field {
 	/* !Definition: */
 	/*------------------------------------------------------------------------- */
 
-  public function __construct(&$parent) {
-    parent::__construct($parent);
+  public function __construct() {
+    parent::__construct();
     $this->_name = __('Multilingual Text');
     $this->_required = true;
-		$this->_driver = $this->_engine->ExtensionManager->create('multilingual_field');
+    $this->_driver = ExtensionManager::create('multilingual_field');
 
 
-		// Get supported languages
-		$this->_lang = LanguageRedirect::instance()->getAllLanguages();
-		$this->_supported_language_codes = LanguageRedirect::instance()->getSupportedLanguageCodes();
-		$this->_current_language = $this->getCurrentLanguage();
+    // Get supported languages
+    $this->_lang = LanguageRedirect::instance()->getAllLanguages();
+    $this->_supported_language_codes = LanguageRedirect::instance()->getSupportedLanguageCodes();
+    $this->_current_language = $this->getCurrentLanguage();
 
-		// Set defaults:
-		$this->set('show_column', 'yes');
-		$this->set('size', 'medium');
-		$this->set('required', 'yes');		
-		
-		$this->_sizes = array(
-			array('single', false, __('Single Line')),
-			array('small', false, __('Small Box')),
-			array('medium', false, __('Medium Box')),
-			array('large', false, __('Large Box')),
-			array('huge', false, __('Huge Box'))
-		);
+    // Set defaults:
+    $this->set('show_column', 'yes');
+    $this->set('size', 'medium');
+    $this->set('required', 'yes');		
+    
+    $this->_sizes = array(
+        array('single', false, __('Single Line')),
+        array('small', false, __('Small Box')),
+        array('medium', false, __('Medium Box')),
+        array('large', false, __('Large Box')),
+        array('huge', false, __('Huge Box'))
+    );
   }
 
 	public function findDefaults(&$fields){
@@ -268,7 +268,7 @@ Class fieldMultilingual extends Field {
 		
 		$input = Widget::Input(
 			"fields[{$order}][text_length]",
-			(integer)$this->get('text_length')
+			$this->get('text_length')
 		);
 		$input->setAttribute('size', '3');
 		
@@ -347,7 +347,7 @@ Class fieldMultilingual extends Field {
 	/*-------------------------------------------------------------------------*/
 
 	public function displayPublishPanel(&$wrapper, $data = null, $error = null, $prefix = null, $postfix = null) {
-		$this->_driver->addPublishHeaders($this->_engine->Page);
+		$this->_driver->addPublishHeaders(Administration::instance()->Page);
 		
 		$sortorder = $this->get('sortorder');
 		$element_name = $this->get('element_name');

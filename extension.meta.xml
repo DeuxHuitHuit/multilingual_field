@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<extension id="multilingual_field">
+<extension id="multilingual_field" xmlns="http://symphony-cms.com/schemas/extension/1.0">
 <name>Multilingual Field</name>
 <description>Create a textbox field for each language defined in the Preferences as Language Redirect making easy to create content in multiple languages.</description>
 <repo type="github">https://github.com/6ui11em/multilingual_field</repo>
