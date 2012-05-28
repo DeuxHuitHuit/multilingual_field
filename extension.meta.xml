@@ -1,50 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<extension id="multilingual_field">
-<name>Multilingual Field</name>
-<description>Create a textbox field for each language defined in the Preferences as Language Redirect making easy to create content in multiple languages.</description>
-<repo type="github">https://github.com/6ui11em/multilingual_field</repo>
-<url type="discuss">http://symphony-cms.com/discuss/thread/46067/</url>
-<types>
-<type>Field</type>
-<type>Field Types</type>
-<type>Multilingual</type>
-</types>
-<authors>
-<author>
-<name github="6ui11em" symphony="guillem_l">Guillem Lorman</name>
-<email>guillem@bajoelcocotero.com</email>
-<website>http://bajoelcocotero.com</website>
-</author>
-</authors>
-<dependencies>
-<dependency version="1.0.2">http://github.com/klaftertief/language_redirect</dependency>
-</dependencies>
-<releases>
-<release version="1.0" date="2010-06-11" min="2.0.6" />
-<release version="1.2" date="2010-02-17" min="2.0.6">
-- Add multilingual handles to work with localized URL params
-- Add compatibility with tinyMCE formatter
-- Add compatibility with Publish Filtering extension by Nick Dunn(http://github.com/nickdunn/publishfiltering)
-</release>
-<release version="1.3" date="2011-02-13" min="2.2">
-- Symphony 2.2 compatibility
-- Language Redirect 1.0.1 compatibility
-</release>
-<release version="1.3.2" date="2011-05-27" min="2.2">
-- Added full support for frontend submit (create/update).
-</release>
-<release version="1.4" date="2011-05-12" min="2.2">
-- Requires Language Redirect 1.0.2 or higher
-- Use the standard Multilingual class from Language Redirect 1.0.2
-- Add option to enable / disable the generation of unique handles for single line fields.
-- Bug fix in character counter.
-</release>
-<release version="1.4.1" date="2011-11-12" min="2.2">
-- Add an option to the fields definition to set if field has to show the values of default language when the value of selected language is empty.
-</release>
-</releases>
-<media>
-<item type="image" url="http://symphony-cms.com/workspace/downloads/extensions/images/Imagen-17-1276279701.png">Multilingual Field Preview.</item>
-</media>
+<extension id="multilingual_field" status="released" xmlns="http://symphony-cms.com/schemas/extension/1.0">
+	<name>Field: Multilingual Text Box</name>
+
+	<description>The multilingual version of Textbox field.</description>
+
+	<repo type="github">https://github.com/6ui11em/multilingual_field</repo>
+
+	<url type="discuss">http://symphony-cms.com/discuss/thread/46067/</url>
+
+	<types>
+		<type>Field</type>
+		<type>Field Types</type>
+		<type>Multilingual</type>
+	</types>
+
+	<authors>
+		<author>
+			<name github="6ui11em" symphony="guillem_l">Guillem Lorman</name>
+			<email>guillem@bajoelcocotero.com</email>
+			<website>http://bajoelcocotero.com</website>
+		</author>
+		<author>
+			<name github="vlad-ghita" symphony="vladG">Vlad Ghita</name>
+			<email>vlad_micutul@yahoo.com</email>
+			<website>http://www.xanderadvertising.com</website>
+		</author>
+	</authors>
+
+	<dependencies>
+		<dependency version="1.6">http://github.com/vlad-ghita/frontend_localisation</dependency>
+	</dependencies>
+
+	<releases>
+		<release version="2.0" date="2012-05-15" min="2.3">
+			* Complete rewrite.
+			* Symphony 2.3 compatibility.
+			* Depends on Frontend Localisation
+			* It now extends Textbox Field, benefitting from all goodies.
+		</release>
+
+		<release version="1.4.1" date="2011-11-12" min="2.2">
+			- Add an option to the fields definition to set if field has to show the values of default language when the value of selected language is empty.
+		</release>
+
+		<release version="1.4" date="2011-05-12" min="2.2">
+			- Requires Language Redirect 1.0.2 or higher
+			- Use the standard Multilingual class from Language Redirect 1.0.2
+			- Add option to enable / disable the generation of unique handles for single line fields.
+			- Bug fix in character counter.
+		</release>
+
+		<release version="1.3.2" date="2011-05-27" min="2.2">
+			- Added full support for frontend submit (create/update).
+		</release>
+
+		<release version="1.3" date="2011-02-13" min="2.2">
+			- Symphony 2.2 compatibility
+			- Language Redirect 1.0.1 compatibility
+		</release>
+
+		<release version="1.2" date="2010-02-17" min="2.0.6">
+			- Add multilingual handles to work with localized URL params
+			- Add compatibility with tinyMCE formatter
+			- Add compatibility with Publish Filtering extension by Nick Dunn(http://github.com/nickdunn/publishfiltering)
+		</release>
+
+		<release version="1.0" date="2010-06-11" min="2.0.6"/>
+	</releases>
+
+	<media>
+		<item type="image" url="http://symphony-cms.com/workspace/downloads/extensions/images/Imagen-17-1276279701.png">Multilingual Text Field preview.</item>
+	</media>
 
 </extension>
