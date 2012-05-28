@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension id="multilingual_field" status="released" xmlns="http://symphony-cms.com/schemas/extension/1.0">
-	<name>Multilingual Text Box</name>
+	<name>Field: Multilingual Text Box</name>
 
-	<description>The multilingual version of Textbox Field.</description>
+	<description>The multilingual version of Textbox field.</description>
 
 	<repo type="github">https://github.com/6ui11em/multilingual_field</repo>
 

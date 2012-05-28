@@ -1,28 +1,32 @@
-# Multilingual Text Box
-
-
-## 1. About
-
-The multilingual version of [Text Box field](https://github.com/rowan-lewis/textboxfield).
+Field: Multilingual Text Box
+======================
 
 
 
-## 2. Installation
+## 1 About
 
-1. Upload the 'multilingual_field' folder in this archive to your Symphony 'extensions' folder.
-
-2. Install and enable the extension Frontend Localisation if this is not installed yet.
-
-3. Enable it by selecting the **Multilingual Text Box** extension, choose Enable from the with-selected menu, and then click Apply.
-
-4. Add the **Multilingual Text Box** field to your sections.
+The multilingual version of [Text Box field](http://symphonyextensions.com/extensions/textboxfield/).
 
 
 
-## 3. Update from earlier versions
+## 2 Installation
 
-1. Upload the new version of 'multilingual_field' folder in this archive to your Symphony 'extensions' folder.  
+Dependencies:
 
-2. Re-enable the extension selecting **Multilingual Text Box** extension, choose Enable from the with-selected menu, and then click Apply.
+1. Install [Text Box field](http://symphonyextensions.com/extensions/textboxfield/) if it's not already installed.
+2. Install [Frontend Localisation](http://symphonyextensions.com/extensions/frontend_localisation/) if it's not already installed.
+
+This extension:
+
+1. Upload the `multilingual_field` folder in this archive to your Symphony `extensions` folder.
+2. On `Extensions` page in Admin, install it by selecting `Field: Multilingual Text Box`, choose `Enable/Install` from the `With Selected` menu, then click `Apply`.
+3. The field will be available in the list when creating a Section.
+
+
+
+## 3 Update from earlier versions
+
+1. Upload the new version of `multilingual_field` folder in this archive to your Symphony `extensions` folder.
+2. On `Extensions` page in Admin, re-enable it by selecting `Field: Multilingual Text Box`, choose `Enable/Install` from the `With Selected` menu, then click `Apply`.
 
 It's **very** important to execute the Database updates.

@@ -1,15 +1,15 @@
-.field-multilingual-textbox .size-small {
+.field-multilingual_textbox .size-small {
 	height: 5em;
 }
-.field-multilingual-textbox .size-medium {
+.field-multilingual_textbox .size-medium {
 	height: 20em;
 }
-.field-multilingual-textbox .size-large {
+.field-multilingual_textbox .size-large {
 	height: 35em;
 }
-.field-multilingual-textbox .size-huge {
+.field-multilingual_textbox .size-huge {
 	height: 50em;
 }
-.field-multilingual-textbox i.invalid {
+.field-multilingual_textbox i.invalid {
 	color: #f2dede;
 }
