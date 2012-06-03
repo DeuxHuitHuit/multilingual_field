@@ -371,7 +371,7 @@
 			$lang_code = FLang::getLangCode();
 
 			// If value is empty for this language, load value from main language
-			if( $this->get('def_ref_lang') == 'yes' && $data['handle-'.$lang_code] === '' ){
+			if( $this->get('def_ref_lang') == 'yes' && $data['value-'.$lang_code] === '' ){
 				$lang_code = FLang::getMainLang();
 			}
 
@@ -395,7 +395,7 @@
 			$lang_code = FLang::getLangCode();
 
 			// If value is empty for this language, load value from main language
-			if( $this->get('def_ref_lang') == 'yes' && $data['handle-'.$lang_code] === '' ){
+			if( $this->get('def_ref_lang') == 'yes' && $data['value-'.$lang_code] === '' ){
 				$lang_code = FLang::getMainLang();
 			}
 

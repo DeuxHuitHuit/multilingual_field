@@ -47,11 +47,13 @@
 		}
 
 		public function update($prev_version){
+
 			if( version_compare($prev_version, '2.0', '<') ){
-				$v1x_table = 'tbl_fields_multilingual';
+
+				$v1x_table = 'tbl_fields_multilingual_textbox';
 
 				$fields = Symphony::Database()->fetch(sprintf("SELECT field_id FROM `%s`", $v1x_table));
-
+				
 				if( version_compare($prev_version, '1.1', '<') ){
 					foreach( $fields as $field ){
 						$entries_table = 'tbl_entries_data_'.$field["field_id"];
@@ -60,6 +62,7 @@
 							Symphony::Database()->query("ALTER TABLE `{$entries_table}` ADD COLUMN `value` TEXT DEFAULT NULL");
 
 					}
+
 				}
 
 				if( version_compare($prev_version, '1.2', '<') ){
@@ -90,8 +93,9 @@
 					Symphony::Database()->query(sprintf("ALTER TABLE `%s` ADD COLUMN `use_def_lang_vals` ENUM('yes','no') DEFAULT 'yes'", $v1x_table));
 					Symphony::Database()->query(sprintf("UPDATE `%s` SET `use_def_lang_vals` = 'yes'", $v1x_table));
 				}
-
+				
 				if( version_compare($prev_version, '2.0', '<') ){
+				
 					Symphony::Database()->query(sprintf(
 						"RENAME TABLE `%s` TO `%s`;",
 						$v1x_table, self::FIELD_TABLE
@@ -118,7 +122,6 @@
 						self::FIELD_TABLE
 					));
 
-
 					foreach( $fields as $field ){
 						$entries_table = 'tbl_entries_data_'.$field["field_id"];
 
@@ -133,12 +136,12 @@
 							if( !$this->updateHasColumn('value_formatted-'.$lc, $entries_table) ){
 								Symphony::Database()->query(sprintf(
 									'ALTER TABLE `%1$s`
-										CHANGE COLUMN `value_format-%2$s` `value_formatted-%2$s` CHARACTER SET utf8 COLLATE utf8_unicode_ci TEXT DEFAULT NULL,
-										MODIFY `handle-%2$s` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
-										MODIFY `value-%2$s` TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
-										MODIFY `word_count-%2$s` INT(11) UNSIGNED CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
-										ADD FULLTEXT KEY `value-%2$s` (value-%2$s),
-										ADD FULLTEXT KEY `value_formatted-%2$s` (value_formatted-%2$s);',
+										CHANGE COLUMN `value_format-%2$s` `value_formatted-%2$s` TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+										MODIFY `handle-%2$s` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+										MODIFY `value-%2$s` TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+										MODIFY `word_count-%2$s` INT(11) UNSIGNED DEFAULT NULL,
+										ADD FULLTEXT KEY `value-%2$s` (`value-%2$s`),
+										ADD FULLTEXT KEY `value_formatted-%2$s` (`value_formatted-%2$s`);',
 									$entries_table, $lc
 								));
 							}

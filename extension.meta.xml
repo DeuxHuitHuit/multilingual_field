@@ -37,6 +37,7 @@
 			* Symphony 2.3 compatibility.
 			* Depends on Frontend Localisation
 			* It now extends Textbox Field, benefitting from all goodies.
+			* No compatible with Language Redirect.
 		</release>
 
 		<release version="1.4.1" date="2011-11-12" min="2.2">
