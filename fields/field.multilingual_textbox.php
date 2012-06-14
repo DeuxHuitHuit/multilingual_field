@@ -338,7 +338,7 @@
 		}
 
 		public function processRawFieldData($data, &$status, &$message = null, $simulate = false, $entry_id = null){
-			if( !is_array($data) || empty($data) ) return parent::processRawFieldData($data, $status, $message, $simulate, $entry_id);
+			if( !is_array($data) ) $data = array();
 
 			$status = self::__OK__;
 			$result = array();
@@ -346,7 +346,7 @@
 
 			foreach( FLang::getLangs() as $lc ){
 
-				$data = $field_data[$lc];
+				$data = isset($field_data[$lc]) ? $field_data[$lc] : '';
 
 				$formatted = $this->applyFormatting($data);
 
