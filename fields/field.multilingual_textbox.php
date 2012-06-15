@@ -73,7 +73,7 @@
 
 			if( $this->isHandleLocked($handle, $entry_id, $lang_code) ){
 				if( $this->isHandleFresh($handle, $value, $entry_id, $lang_code) ){
-					return $this->getCurrentHandle($entry_id);
+					return $this->getCurrentHandle($entry_id, $lang_code);
 				}
 
 				else{
@@ -86,6 +86,23 @@
 			}
 
 			return $handle;
+		}
+
+		public function getCurrentHandle($entry_id, $lang_code){
+			return Symphony::Database()->fetchVar('handle', 0, sprintf(
+				"
+					SELECT
+						f.`handle-%s`
+					FROM
+						`tbl_entries_data_%s` AS f
+					WHERE
+						f.entry_id = '%s'
+					LIMIT 1
+				",
+				$lang_code,
+				$this->get('id'),
+				$entry_id
+			));
 		}
 
 		public function isHandleLocked($handle, $entry_id, $lang_code){
@@ -115,10 +132,12 @@
 					WHERE
 						f.entry_id = '%s'
 						AND f.`value-%s` = '%s'
+						AND f.`handle-%s` = '%s'
 					LIMIT 1
 				",
-				$this->get('id'), $entry_id, $lang_code,
-				$this->cleanValue(General::sanitize($value))
+				$this->get('id'), $entry_id,
+				$lang_code, $this->cleanValue(General::sanitize($value)),
+				$lang_code, $this->cleanValue(General::sanitize($handle))
 			));
 		}
 
