@@ -386,28 +386,79 @@
 		/*  Output  */
 		/*------------------------------------------------------------------------------------------------*/
 
-		public function appendFormattedElement(XMLElement &$wrapper, $data, $encode = false, $mode = null){
-			$lang_code = FLang::getLangCode();
+		public function fetchIncludableElements() {
+			$includable_elements = parent::fetchIncludableElements();
+			$includable_elements[] = $this->get('element_name') . ': all-languages: formatted';
+			$includable_elements[] = $this->get('element_name') . ': all-languages: unformatted';
+			return $includable_elements;
+		}
 
-			// If value is empty for this language, load value from main language
-			if( $this->get('def_ref_lang') == 'yes' && $data['value-'.$lang_code] === '' ){
-				$lang_code = FLang::getMainLang();
+		public function appendFormattedElement(XMLElement &$wrapper, $data, $encode = false, $mode = null){
+
+			// all-languages
+			if( strpos($mode, 'all-languages') !== false ){
+				$submode = strpos($mode, 'unformatted') ? 'unformatted' : 'formatted';
+
+				$all = new XMLElement($this->get('element_name'), NULL, array('mode' => $mode));
+
+				foreach (FLang::getLangs() as $lc) {
+					$data['handle'] = $data['handle-'.$lc];
+					$data['value'] = $data['value-'.$lc];
+					$data['value_formatted'] = $data['value_formatted-'.$lc];
+					$data['word_count'] = $data['word_count-'.$lc];
+
+					$attributes = array(
+						'lang' => $lc
+					);
+
+					$item = new XMLElement(
+						'item', null, $attributes
+					);
+
+					parent::appendFormattedElement($item, $data, true, $submode);
+
+					// Reformat generated XML
+					$elem = $item->getChild(0);
+					if (!is_null($elem)) {
+						$attributes = $elem->getAttributes();
+						unset($attributes['mode']);
+						$value = $elem->getValue();
+						$item->setAttributeArray($attributes);
+						$item->setValue($value);
+						$item->removeChildAt(0);
+					}
+
+					$all->appendChild($item);
+				}
+
+				$wrapper->appendChild($all);
 			}
 
-			$data['handle'] = $data['handle-'.$lang_code];
-			$data['value'] = $data['value-'.$lang_code];
-			$data['value_formatted'] = $data['value_formatted-'.$lang_code];
-			$data['word_count'] = $data['word_count-'.$lang_code];
+			// current-language
+			else{
+				$lang_code = FLang::getLangCode();
 
-			parent::appendFormattedElement($wrapper, $data);
+				// If value is empty for this language, load value from main language
+				if( $this->get('def_ref_lang') == 'yes' && $data['value-'.$lang_code] === '' ){
+					$lang_code = FLang::getMainLang();
+				}
 
-			$elem = $wrapper->getChildByName($this->get('element_name'), 0);
 
-			if( !is_null($elem) )
-				if( $this->get('text_handle') === 'yes' )
-					foreach( FLang::getLangs() as $lc ){
-						$elem->setAttribute("handle-{$lc}", $data["handle-{$lc}"]);
-					}
+				$data['handle'] = $data['handle-'.$lang_code];
+				$data['value'] = $data['value-'.$lang_code];
+				$data['value_formatted'] = $data['value_formatted-'.$lang_code];
+				$data['word_count'] = $data['word_count-'.$lang_code];
+
+				parent::appendFormattedElement($wrapper, $data, $encode, $mode);
+
+				$elem = $wrapper->getChildByName($this->get('element_name'), 0);
+
+				if( !is_null($elem) )
+					if( $this->get('text_handle') === 'yes' )
+						foreach( FLang::getLangs() as $lc ){
+							$elem->setAttribute("handle-{$lc}", $data["handle-{$lc}"]);
+						}
+			}
 		}
 
 		public function prepareTableValue($data, XMLElement $link = null){
