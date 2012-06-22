@@ -387,17 +387,28 @@
 		/*------------------------------------------------------------------------------------------------*/
 
 		public function fetchIncludableElements() {
-			$includable_elements = parent::fetchIncludableElements();
-			$includable_elements[] = $this->get('element_name') . ': all-languages: formatted';
-			$includable_elements[] = $this->get('element_name') . ': all-languages: unformatted';
+			$parent_elements = parent::fetchIncludableElements();
+			$includable_elements = $parent_elements;
+
+			$name = $this->get('element_name');
+			$name_length = strlen($name);
+
+			foreach( $parent_elements as $element ){
+				$includable_elements[] = $name.': all-languages'.substr($element, $name_length);
+			}
+
 			return $includable_elements;
 		}
 
 		public function appendFormattedElement(XMLElement &$wrapper, $data, $encode = false, $mode = null){
 
 			// all-languages
-			if( strpos($mode, 'all-languages') !== false ){
-				$submode = strpos($mode, 'unformatted') ? 'unformatted' : 'formatted';
+			$all_languages = strpos($mode, 'all-languages');
+
+			if( $all_languages !== false ){
+				$submode = substr($mode, $all_languages+15);
+
+				if( empty($submode) ) $submode = 'formatted';
 
 				$all = new XMLElement($this->get('element_name'), NULL, array('mode' => $mode));
 
@@ -415,7 +426,7 @@
 						'item', null, $attributes
 					);
 
-					parent::appendFormattedElement($item, $data, true, $submode);
+					parent::appendFormattedElement($item, $data, $encode, $submode);
 
 					// Reformat generated XML
 					$elem = $item->getChild(0);
