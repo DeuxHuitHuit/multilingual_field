@@ -50,7 +50,7 @@
 
 			if( version_compare($prev_version, '2.0', '<') ){
 
-				$v1x_table = 'tbl_fields_multilingual_textbox';
+				$v1x_table = 'tbl_fields_multilingual';
 
 				$fields = Symphony::Database()->fetch(sprintf("SELECT field_id FROM `%s`", $v1x_table));
 				
