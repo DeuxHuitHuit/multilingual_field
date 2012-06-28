@@ -525,12 +525,16 @@
 		/*------------------------------------------------------------------------------------------------*/
 
 		public function buildDSRetrivalSQL($data, &$joins, &$where, $andOperation = false){
-			parent::buildDSRetrivalSQL($data, $joins, $where, $andOperation);
+			$multi_where = '';
+
+			parent::buildDSRetrivalSQL($data, $joins, $multi_where, $andOperation);
 
 			$lc = FLang::getLangCode();
 
-			$where = str_replace('.value', ".`value-{$lc}`", $where);
-			$where = str_replace('.handle', ".`handle-{$lc}`", $where);
+			$multi_where = str_replace('.value', ".`value-{$lc}`", $multi_where);
+			$multi_where = str_replace('.handle', ".`handle-{$lc}`", $multi_where);
+
+			$where .= $multi_where;
 
 			return true;
 		}
