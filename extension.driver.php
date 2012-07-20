@@ -330,9 +330,9 @@
 							Symphony::Database()->query(sprintf("
 								ALTER TABLE `%s`
 									ADD COLUMN `handle-{$lc}` varchar(255) default NULL,
-									ADD COLUMN `value-{$lc}` int(11) unsigned NULL,
-									ADD COLUMN `value_formatted-{$lc}` varchar(255) default NULL,
-									ADD COLUMN `word_count-{$lc}` varchar(50) default NULL;",
+									ADD COLUMN `value-{$lc}` text default NULL,
+									ADD COLUMN `value_formatted-{$lc}` text default NULL,
+									ADD COLUMN `word_count-{$lc}` int(11) default NULL;",
 								$entries_table));
 						}
 					}
