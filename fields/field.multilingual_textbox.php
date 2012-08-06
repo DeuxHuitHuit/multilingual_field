@@ -67,7 +67,7 @@
 		/*------------------------------------------------------------------------------------------------*/
 
 		public function createHandle($value, $entry_id, $lang_code = null){
-			if( FLang::validateLangCode($lang_code) ) $lang_code = FLang::getLangCode();
+			if( !FLang::validateLangCode($lang_code) ) $lang_code = FLang::getLangCode();
 
 			$handle = Lang::createHandle(strip_tags(html_entity_decode($value)));
 
