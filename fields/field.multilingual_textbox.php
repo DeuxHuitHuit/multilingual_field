@@ -195,6 +195,13 @@
 		/*------------------------------------------------------------------------------------------------*/
 
 		public function displayPublishPanel(&$wrapper, $data = null, $error = null, $prefix = null, $postfix = null){
+
+			// We've been called out of context: Pulblish Filter
+			$callback = Administration::instance()->getPageCallback();
+			if($callback['context']['page'] != 'edit' && $callback['context']['page'] != 'new') {
+				return;
+			}
+
 			Extension_Frontend_Localisation::appendAssets();
 			Extension_Multilingual_Field::appendHeaders(
 				Extension_Multilingual_Field::PUBLISH_HEADERS
