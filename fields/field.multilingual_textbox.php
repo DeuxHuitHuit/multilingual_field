@@ -548,6 +548,31 @@
 
 
 
+	/*-------------------------------------------------------------------------
+		Sorting:
+	-------------------------------------------------------------------------*/
+
+		public function buildSortingSQL(&$joins, &$where, &$sort, $order = 'ASC') {
+			$lc = FLang::getLangCode();
+
+			if (in_array(strtolower($order), array('random', 'rand'))) {
+				$sort = 'ORDER BY RAND()';
+			}
+
+			else {
+				$sort = sprintf('
+					ORDER BY (
+						SELECT `%s`
+						FROM tbl_entries_data_%d
+						WHERE entry_id = e.id
+					) %s',
+					'handle-'.$lc,
+					$this->get('id'),
+					$order
+				);
+			}
+		}
+
 		/*------------------------------------------------------------------------------------------------*/
 		/*  Grouping  */
 		/*------------------------------------------------------------------------------------------------*/
