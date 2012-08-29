@@ -382,6 +382,17 @@
 					'value_formatted-'.$lc => $formatted,
 					'word_count-'.$lc => General::countWords($data)
 				));
+
+				// Insert values of default language as default values of the field for compatibility with other extensions 
+				// that watch the values without lang code.
+				if (FLang::getMainLang() == $lc) {
+					$result = array_merge($result, array(
+						'handle' => $this->createHandle($formatted, $entry_id, $lc),
+						'value' => (string)$data,
+						'value_formatted' => $formatted,
+						'word_count' => General::countWords($data)
+					));
+				}
 			}
 
 			return $result;
