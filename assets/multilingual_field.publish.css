@@ -13,3 +13,7 @@
 .field-multilingual_textbox i.invalid {
 	color: #f2dede;
 }
+
+.field-multilingual_textbox textarea {
+	resize: vertical;
+}
