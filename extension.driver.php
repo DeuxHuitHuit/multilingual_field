@@ -222,7 +222,7 @@
 					$page->addScriptToHead(URL.'/extensions/'.MTB_GROUP.'/assets/'.MTB_GROUP.'.publish.js');
 				}
 
-				if( $type === self::SETTING_HEADERS ){
+				if( $type === self::FILTER_HEADERS ){
 					$page->addStylesheetToHead(URL.'/extensions/textboxfield/assets/textboxfield.settings.css', 'screen');
 				}
 
