@@ -16,7 +16,7 @@
 		public function __construct() {
 			parent::__construct();
 
-			$this->_name = __('Multilingual Text Box');
+			$this->_name = 'Multilingual Text Box';
 		}
 
 		public function createTable() {
@@ -159,8 +159,8 @@
 		public function displaySettingsPanel(XMLElement &$wrapper, $errors = null) {
 			parent::displaySettingsPanel($wrapper, $errors);
 
-			foreach ($wrapper->getChildrenByName('ul') as /* @var XMLElement $list */
-				$list) {
+			foreach ($wrapper->getChildrenByName('ul') as $list) {
+				/* @var XMLElement $list */
 
 				if ($list->getAttribute('class') === 'options-list') {
 					$item = new XMLElement('li');
@@ -179,8 +179,8 @@
 			}
 		}
 
-		public function commit($propogate = null) {
-			if (!parent::commit($propogate)) {
+		public function commit() {
+			if (!parent::commit()) {
 				return false;
 			}
 
@@ -203,9 +203,9 @@
 
 		public function displayPublishPanel(&$wrapper, $data = null, $error = null, $prefix = null, $postfix = null) {
 
-			// We've been called out of context: Pulblish Filter
+			// We've been called out of context: Publish Filter
 			$callback = Administration::instance()->getPageCallback();
-			if ($callback['context']['page'] != 'edit' && $callback['context']['page'] != 'new') {
+			if (!in_array($callback['context']['page'], array('edit', 'new'))) {
 				return;
 			}
 
@@ -243,7 +243,7 @@
 			if ($optional !== '') {
 				foreach ($langs as $lc) {
 					$label->appendChild(new XMLElement('i', $optional, array(
-						'class'          => 'tab-element tab-' . $lc,
+						'class'          => "tab-element tab-$lc",
 						'data-lang_code' => $lc
 					)));
 				}
@@ -278,7 +278,7 @@
 				// Input box:
 				if ($this->get('text_size') === 'single') {
 					$input = Widget::Input(
-						"fields{$prefix}[$element_name]{$postfix}[{$lc}]", General::sanitize($data['value-' . $lc])
+						"fields{$prefix}[$element_name]{$postfix}[{$lc}]", General::sanitize($data["value-$lc"])
 					);
 
 					###
@@ -290,7 +290,7 @@
 				// Text Box:
 				else {
 					$input = Widget::Textarea(
-						"fields{$prefix}[$element_name]{$postfix}[{$lc}]", 20, 50, General::sanitize($data['value-' . $lc])
+						"fields{$prefix}[$element_name]{$postfix}[{$lc}]", 20, 50, General::sanitize($data["value-$lc"])
 					);
 
 					###
@@ -312,7 +312,7 @@
 				));
 
 				Symphony::ExtensionManager()->notifyMembers(
-					$delegate, '/backend/',
+					$delegate , '/backend/',
 					array(
 						'field'    => $this,
 						'label'    => $div,
@@ -360,11 +360,13 @@
 				// if one language fails, all fail
 				if ($status != self::__OK__) {
 
+					$local_msg = "<br />[$lc] {$all_langs[$lc]}: {$file_message}";
+
 					if ($lc === $main_lang) {
-						$message = "<br />{$all_langs[$lc]}: {$file_message}" . $message;
+						$message = $local_msg . $message;
 					}
 					else {
-						$message .= "<br />{$all_langs[$lc]}: {$file_message}";
+						$message = $message . $local_msg;
 					}
 
 					$error = self::__ERROR__;
@@ -537,10 +539,10 @@
 
 		public function getExampleFormMarkup() {
 			$label = Widget::Label($this->get('label') . '
-					<!-- ' . __('Modify just current language value') . ' -->
-					<input name="fields[' . $this->get('element_name') . '][value-{$url-fl-language}]" type="text" />
+				<!--' . __('Modify just current language value') . '-->
+					<input name = "fields[' . $this->get('element_name') . '][value-{$url-fl-language}]" type ="text" />
 
-					<!-- ' . __('Modify all values') . ' -->');
+					<!--' . __('Modify all values') . '-->');
 
 			if ($this->get('text_size') === 'single') {
 				foreach (FLang::getLangs() as $lc) {
@@ -569,8 +571,8 @@
 
 			$lc = FLang::getLangCode();
 
-			$multi_where = str_replace('.value', ".`value-{$lc}`", $multi_where);
-			$multi_where = str_replace('.handle', ".`handle-{$lc}`", $multi_where);
+			$multi_where = str_replace(' . value', ".`value-{$lc}`", $multi_where);
+			$multi_where = str_replace(' . handle', ".`handle-{$lc}`", $multi_where);
 
 			$where .= $multi_where;
 
@@ -592,10 +594,10 @@
 
 			else {
 				$sort = sprintf('
-					ORDER BY (
-						SELECT `%s`
-						FROM tbl_entries_data_%d
-						WHERE entry_id = e.id
+					ORDER BY(
+				SELECT `%s`
+						FROM tbl_entries_data_ % d
+						WHERE entry_id = e . id
 					) %s',
 					'handle-' . $lc,
 					$this->get('id'),
@@ -654,15 +656,15 @@
 				$langs = FLang::getLangs();
 			}
 			$text = $value[0];
-			$text = str_replace('&nbsp;', ' ', html_entity_decode($value[0]));
+			$text = str_replace(' &nbsp;', ' ', html_entity_decode($value[0]));
 
 			$xml = @simplexml_load_string($text);
 			if (!$xml) {
 
 				//use this for the normal articles
-				$xml = @simplexml_load_string(str_replace('&', '&amp;', $text));
+				$xml = @simplexml_load_string(str_replace(' &', ' &amp;', $text));
 				if (!$xml) {
-					$text = str_replace('&', '&amp;', $text);
+					$text = str_replace(' &', ' &amp;', $text);
 					$text = iconv("UTF-8", "UTF-8//IGNORE", $text);
 					$xml  = simplexml_load_string($text);
 				}
