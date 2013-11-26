@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension id="multilingual_field" status="released" xmlns="http://symphony-cms.com/schemas/extension/1.0">
-	<name>Field: Multilingual Text Box</name>
+	<name>Multilingual Text Box</name>
 
 	<description>The multilingual version of Textbox field.</description>
 
-	<repo type="github">https://github.com/6ui11em/multilingual_field</repo>
+	<repo type="github">https://github.com/vlad-ghita/multilingual_field</repo>
 
 	<url type="discuss">http://symphony-cms.com/discuss/thread/46067/</url>
 
@@ -16,11 +16,6 @@
 
 	<authors>
 		<author>
-			<name github="6ui11em" symphony="guillem_l">Guillem Lorman</name>
-			<email>guillem@bajoelcocotero.com</email>
-			<website>http://bajoelcocotero.com</website>
-		</author>
-		<author>
 			<name github="vlad-ghita" symphony="vladG">Vlad Ghita</name>
 			<email>vlad_micutul@yahoo.com</email>
 			<website>http://www.xanderadvertising.com</website>
@@ -28,10 +23,14 @@
 	</authors>
 
 	<dependencies>
-		<dependency version="1.6">http://github.com/vlad-ghita/frontend_localisation</dependency>
+		<dependency version="2.2">http://github.com/vlad-ghita/frontend_localisation</dependency>
 	</dependencies>
 
 	<releases>
+		<release version="3.0" date="2013-11-26" min="2.3">
+			* Added 2 new ouput modes that supply information for all languages.
+		</release>
+
 		<release version="2.1" date="2012-06-22" min="2.3">
 			* Added 2 new ouput modes that supply information for all languages.
 		</release>
