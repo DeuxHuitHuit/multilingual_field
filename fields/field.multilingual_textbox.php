@@ -65,22 +65,22 @@
 		/*  Utilities  */
 		/*------------------------------------------------------------------------------------------------*/
 
-		public function createHandle($value, $entry_id, $lang_code = null) {
-			if (!FLang::validateLangCode($lang_code)) {
-				$lang_code = FLang::getLangCode();
+		public function createHandle($value, $entry_id, $lc = null) {
+			if (!FLang::validateLangCode($lc)) {
+				$lc = FLang::getLangCode();
 			}
 
 			$handle = Lang::createHandle(strip_tags(html_entity_decode($value)));
 
-			if ($this->isHandleLocked($handle, $entry_id, $lang_code)) {
-				if ($this->isHandleFresh($handle, $value, $entry_id, $lang_code)) {
-					return $this->getCurrentHandle($entry_id, $lang_code);
+			if ($this->isHandleLocked($handle, $entry_id, $lc)) {
+				if ($this->isHandleFresh($handle, $value, $entry_id, $lc)) {
+					return $this->getCurrentHandle($entry_id, $lc);
 				}
 
 				else {
 					$count = 2;
 
-					while ($this->isHandleLocked("{$handle}-{$count}", $entry_id, $lang_code)) {
+					while ($this->isHandleLocked("{$handle}-{$count}", $entry_id, $lc)) {
 						$count++;
 					}
 
@@ -91,7 +91,7 @@
 			return $handle;
 		}
 
-		public function getCurrentHandle($entry_id, $lang_code) {
+		public function getCurrentHandle($entry_id, $lc) {
 			return Symphony::Database()->fetchVar('handle', 0, sprintf(
 				"
 					SELECT
@@ -102,13 +102,13 @@
 						f.entry_id = '%s'
 					LIMIT 1
 				",
-				$lang_code,
+				$lc,
 				$this->get('id'),
 				$entry_id
 			));
 		}
 
-		public function isHandleLocked($handle, $entry_id, $lang_code) {
+		public function isHandleLocked($handle, $entry_id, $lc) {
 			return (boolean) Symphony::Database()->fetchVar('id', 0, sprintf(
 				"
 					SELECT
@@ -120,12 +120,12 @@
 						%s
 					LIMIT 1
 				",
-				$this->get('id'), $lang_code, $handle,
+				$this->get('id'), $lc, $handle,
 				(!is_null($entry_id) ? "AND f.entry_id != '{$entry_id}'" : '')
 			));
 		}
 
-		public function isHandleFresh($handle, $value, $entry_id, $lang_code) {
+		public function isHandleFresh($handle, $value, $entry_id, $lc) {
 			return (boolean) Symphony::Database()->fetchVar('id', 0, sprintf(
 				"
 					SELECT
@@ -139,8 +139,8 @@
 					LIMIT 1
 				",
 				$this->get('id'), $entry_id,
-				$lang_code, $this->cleanValue(General::sanitize($value)),
-				$lang_code, $this->cleanValue(General::sanitize($handle))
+				$lc, $this->cleanValue(General::sanitize($value)),
+				$lc, $this->cleanValue(General::sanitize($handle))
 			));
 		}
 
@@ -312,7 +312,7 @@
 				));
 
 				Symphony::ExtensionManager()->notifyMembers(
-					$delegate , '/backend/',
+					$delegate, '/backend/',
 					array(
 						'field'    => $this,
 						'label'    => $div,
@@ -392,10 +392,10 @@
 				$formatted = $this->applyFormatting($data);
 
 				$result = array_merge($result, array(
-					'handle-' . $lc          => $this->createHandle($formatted, $entry_id, $lc),
-					'value-' . $lc           => (string) $data,
-					'value_formatted-' . $lc => $formatted,
-					'word_count-' . $lc      => General::countWords($data)
+					"handle-$lc"          => $this->createHandle($formatted, $entry_id, $lc),
+					"value-$lc"           => (string) $data,
+					"value_formatted-$lc" => $formatted,
+					"word_count-$lc"      => General::countWords($data)
 				));
 
 				// Insert values of default language as default values of the field for compatibility with other extensions 
@@ -448,10 +448,10 @@
 				$all = new XMLElement($this->get('element_name'), null, array('mode' => $mode));
 
 				foreach (FLang::getLangs() as $lc) {
-					$data['handle']          = $data['handle-' . $lc];
-					$data['value']           = $data['value-' . $lc];
-					$data['value_formatted'] = $data['value_formatted-' . $lc];
-					$data['word_count']      = $data['word_count-' . $lc];
+					$data['handle']          = $data["handle-$lc"];
+					$data['value']           = $data["value-$lc"];
+					$data['value_formatted'] = $data["value_formatted-$lc"];
+					$data['word_count']      = $data["word_count-$lc"];
 
 					$attributes = array(
 						'lang' => $lc
@@ -482,17 +482,17 @@
 
 			// current-language
 			else {
-				$lang_code = FLang::getLangCode();
+				$lc = FLang::getLangCode();
 
 				// If value is empty for this language, load value from main language
-				if ($this->get('def_ref_lang') == 'yes' && $data['value-' . $lang_code] === '') {
-					$lang_code = FLang::getMainLang();
+				if ($this->get('def_ref_lang') == 'yes' && empty($data["value-$lc"])) {
+					$lc = FLang::getMainLang();
 				}
 
-				$data['handle']          = $data['handle-' . $lang_code];
-				$data['value']           = $data['value-' . $lang_code];
-				$data['value_formatted'] = $data['value_formatted-' . $lang_code];
-				$data['word_count']      = $data['word_count-' . $lang_code];
+				$data['handle']          = $data["handle-$lc"];
+				$data['value']           = $data["value-$lc"];
+				$data['value_formatted'] = $data["value_formatted-$lc"];
+				$data['word_count']      = $data["word_count-$lc"];
 
 				parent::appendFormattedElement($wrapper, $data, $encode, $mode);
 
@@ -501,7 +501,7 @@
 				if (!is_null($elem)) {
 					if ($this->get('text_handle') === 'yes') {
 						foreach (FLang::getLangs() as $lc) {
-							$elem->setAttribute("handle-{$lc}", $data["handle-{$lc}"]);
+							$elem->setAttribute("handle-$lc", $data["handle-$lc"]);
 						}
 					}
 				}
@@ -509,32 +509,32 @@
 		}
 
 		public function prepareTableValue($data, XMLElement $link = null) {
-			$lang_code = Lang::get();
+			$lc = Lang::get();
 
-			if (!FLang::validateLangCode($lang_code)) {
-				$lang_code = FLang::getLangCode();
+			if (!FLang::validateLangCode($lc)) {
+				$lc = FLang::getLangCode();
 			}
 
 			// If value is empty for this language, load value from main language
-			if ($this->get('def_ref_lang') == 'yes' && $data['value-' . $lang_code] === '') {
-				$lang_code = FLang::getMainLang();
+			if ($this->get('def_ref_lang') == 'yes' && empty($data["value-$lc"])) {
+				$lc = FLang::getMainLang();
 			}
 
-			$data['value']           = $data['value-' . $lang_code];
-			$data['value_formatted'] = $data['value_formatted-' . $lang_code];
+			$data['value']           = $data["value-$lc"];
+			$data['value_formatted'] = $data["value_formatted-$lc"];
 
 			return parent::prepareTableValue($data, $link);
 		}
 
 		public function getParameterPoolValue($data) {
-			$lang_code = FLang::getLangCode();
+			$lc = FLang::getLangCode();
 
 			// If value is empty for this language, load value from main language
-			if ($this->get('def_ref_lang') === 'yes' && empty($data['value-' . $lang_code])) {
-				$lang_code = FLang::getMainLang();
+			if ($this->get('def_ref_lang') === 'yes' && empty($data["value-$lc"])) {
+				$lc = FLang::getMainLang();
 			}
 
-			return $data['value-' . $lang_code];
+			return $data["value-$lc"];
 		}
 
 		public function getExampleFormMarkup() {
@@ -571,8 +571,8 @@
 
 			$lc = FLang::getLangCode();
 
-			$multi_where = str_replace(' . value', ".`value-{$lc}`", $multi_where);
-			$multi_where = str_replace(' . handle', ".`handle-{$lc}`", $multi_where);
+			$multi_where = str_replace('.value', ".`value-$lc`", $multi_where);
+			$multi_where = str_replace('.handle', ".`handle-$lc`", $multi_where);
 
 			$where .= $multi_where;
 
@@ -595,11 +595,11 @@
 			else {
 				$sort = sprintf('
 					ORDER BY(
-				SELECT `%s`
-						FROM tbl_entries_data_ % d
-						WHERE entry_id = e . id
+						SELECT `%s`
+						FROM tbl_entries_data_%d
+						WHERE entry_id = e.id
 					) %s',
-					'handle-' . $lc,
+					"handle-$lc",
 					$this->get('id'),
 					$order
 				);
@@ -620,7 +620,7 @@
 			foreach ($records as $record) {
 				$data = $record->getData($this->get('id'));
 
-				$handle  = $data['handle-' . $lc];
+				$handle  = $data["handle-$lc"];
 				$element = $this->get('element_name');
 
 				if (!isset($groups[$element][$handle])) {
@@ -648,33 +648,6 @@
 		public function appendFieldSchema($f) { }
 
 		public function prepareImportValue($data, $mode, $entry_id = null) {
-			//initialize frontend localisation as not initiated
-			$langs = FLang::getLangs();
-			if (empty($langs)) {
-				$flExt = ExtensionManager::create('frontend_localisation');
-				$flExt->dFrontendInitialised();
-				$langs = FLang::getLangs();
-			}
-			$text = $value[0];
-			$text = str_replace(' &nbsp;', ' ', html_entity_decode($value[0]));
-
-			$xml = @simplexml_load_string($text);
-			if (!$xml) {
-
-				//use this for the normal articles
-				$xml = @simplexml_load_string(str_replace(' &', ' &amp;', $text));
-				if (!$xml) {
-					$text = str_replace(' &', ' &amp;', $text);
-					$text = iconv("UTF-8", "UTF-8//IGNORE", $text);
-					$xml  = simplexml_load_string($text);
-				}
-			}
-			$result = array();
-			foreach ($langs as $lc) {
-				$node        = $xml->xpath("//value[@lang='{$lc}']");
-				$result[$lc] = (string) $node[0];
-			}
-
-			return $result;
+			// @todo this must be implemented
 		}
 	}
