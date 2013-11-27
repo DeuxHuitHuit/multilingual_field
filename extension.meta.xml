@@ -23,7 +23,7 @@
 	</authors>
 
 	<dependencies>
-		<dependency version="2.2">http://github.com/vlad-ghita/frontend_localisation</dependency>
+		<dependency version="2.5">http://github.com/vlad-ghita/frontend_localisation</dependency>
 	</dependencies>
 
 	<releases>
