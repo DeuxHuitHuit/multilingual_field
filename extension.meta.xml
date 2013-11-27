@@ -27,6 +27,12 @@
 	</dependencies>
 
 	<releases>
+		<release version="3.0" date="2013-11-26" min="2.3">
+			* Allow textarea to be resized only on vertical axis.
+			* Added language code to error message. Useful to process automatically in frontend forms.
+			* Ability to chose required languages.
+		</release>
+
 		<release version="2.1" date="2012-06-22" min="2.3">
 			* Added 2 new ouput modes that supply information for all languages.
 		</release>
