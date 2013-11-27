@@ -30,6 +30,7 @@
 		<release version="3.0" date="2013-11-26" min="2.3">
 			* Allow textarea to be resized only on vertical axis.
 			* Added language code to error message. Useful to process automatically in frontend forms.
+			* Fixed `Default to main language` feature.
 			* Ability to chose required languages.
 		</release>
 
