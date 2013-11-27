@@ -6,9 +6,6 @@
 
 	require_once(EXTENSIONS . '/textboxfield/extension.driver.php');
 
-	define_safe(MTB_NAME, 'Field: Multilingual Text Box');
-	define_safe(MTB_GROUP, 'multilingual_field');
-
 	Class Extension_Multilingual_Field extends Extension_TextBoxField {
 
 		const FIELD_TABLE = 'tbl_fields_multilingual_textbox';
@@ -20,31 +17,13 @@
 		/*------------------------------------------------------------------------------------------------*/
 
 		public function install() {
-			Symphony::Database()->query(sprintf("
-				CREATE TABLE IF NOT EXISTS `%s` (
-					`id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-					`field_id` INT(11) UNSIGNED NOT NULL,
-					`column_length` INT(11) UNSIGNED DEFAULT 75,
-					`text_size` ENUM('single', 'small', 'medium', 'large', 'huge') DEFAULT 'medium',
-					`text_formatter` VARCHAR(255) DEFAULT NULL,
-					`text_validator` VARCHAR(255) DEFAULT NULL,
-					`text_length` INT(11) UNSIGNED DEFAULT 0,
-					`text_cdata` ENUM('yes', 'no') DEFAULT 'no',
-					`text_handle` ENUM('yes', 'no') DEFAULT 'no',
-					`def_ref_lang` ENUM('yes','no') DEFAULT 'no',
-					PRIMARY KEY (`id`),
-					KEY `field_id` (`field_id`)
-				) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;",
-				self::FIELD_TABLE
-			));
-
-			return true;
+			$this->dropFieldTable();
+			$this->createFieldTable();
 		}
 
 		public function update($prev_version) {
 
 			if (version_compare($prev_version, '2.0', '<')) {
-
 				$v1x_table = 'tbl_fields_multilingual';
 
 				$fields = Symphony::Database()->fetch(sprintf("SELECT field_id FROM `%s`", $v1x_table));
@@ -69,7 +48,7 @@
 
 								$values = Symphony::Database()->fetch("SELECT `id`, `entry_id`, `value-{$lc}` FROM `{$entries_table}` WHERE `handle` IS NOT NULL");
 								foreach ($values as $value) {
-									Symphony::Database()->query("UPDATE  `{$entries_table}` SET `handle-{$lc}` = '" . $this->__createHandle($value["value-" . $lc], $value["entry_id"], $lc, $entries_table) . "' WHERE id = " . $value["id"]);
+									Symphony::Database()->query("UPDATE  `{$entries_table}` SET `handle-{$lc}` = '" . $this->createHandle($value["value-" . $lc], $value["entry_id"], $lc, $entries_table) . "' WHERE id = " . $value["id"]);
 								}
 							}
 						}
@@ -142,26 +121,59 @@
 				}
 			}
 
+			if (version_compare($prev_version, '3.0', '<')) {
+
+				Symphony::Database()->query(sprintf(
+					"ALTER TABLE `%s`
+						CHANGE COLUMN `def_ref_lang` `default_main_lang` ENUM('yes', 'no') CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT 'no',
+						ADD `required_languages` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL;",
+					self::FIELD_TABLE
+				));
+			}
+
 			return true;
 		}
 
 		public function uninstall() {
-			Symphony::Database()->query(sprintf(
-				"DROP TABLE `%s`",
-				self::FIELD_TABLE
-			));
-
-			return true;
+			return $this->dropFieldTable();
 		}
 
-		private function __createHandle($value, $entry_id, $lang, $tbl) {
+		private function createFieldTable() {
+			return Symphony::Database()->query(sprintf("
+				CREATE TABLE IF NOT EXISTS `%s` (
+					`id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+					`field_id` INT(11) UNSIGNED NOT NULL,
+					`column_length` INT(11) UNSIGNED DEFAULT 75,
+					`text_size` ENUM('single', 'small', 'medium', 'large', 'huge') DEFAULT 'medium',
+					`text_formatter` VARCHAR(255) DEFAULT NULL,
+					`text_validator` VARCHAR(255) DEFAULT NULL,
+					`text_length` INT(11) UNSIGNED DEFAULT 0,
+					`text_cdata` ENUM('yes', 'no') DEFAULT 'no',
+					`text_handle` ENUM('yes', 'no') DEFAULT 'no',
+					`default_main_lang` ENUM('yes', 'no') DEFAULT 'no',
+					`required_languages` VARCHAR(255) DEFAULT NULL,
+					PRIMARY KEY (`id`),
+					KEY `field_id` (`field_id`)
+				) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;",
+				self::FIELD_TABLE
+			));
+		}
+
+		private function dropFieldTable() {
+			return Symphony::Database()->query(sprintf(
+				"DROP TABLE IF EXISTS `%s`",
+				self::FIELD_TABLE
+			));
+		}
+
+		private function createHandle($value, $entry_id, $lang, $tbl) {
 
 			$handle = Lang::createHandle(strip_tags(html_entity_decode($value)));
 
-			if ($this->__isHandleLocked($handle, $entry_id, $lang, $tbl)) {
+			if ($this->isHandleLocked($handle, $entry_id, $lang, $tbl)) {
 				$count = 2;
 
-				while ($this->__isHandleLocked("{$handle}-{$count}", $entry_id, $lang, $tbl)) {
+				while ($this->isHandleLocked("{$handle}-{$count}", $entry_id, $lang, $tbl)) {
 					$count++;
 				}
 
@@ -171,7 +183,7 @@
 			return $handle;
 		}
 
-		private function __isHandleLocked($handle, $entry_id, $lang, $tbl) {
+		private function isHandleLocked($handle, $entry_id, $lang, $tbl) {
 			return (boolean) Symphony::Database()->fetchVar('id', 0, sprintf(
 				"
 				SELECT
@@ -209,8 +221,8 @@
 				$page = Administration::instance()->Page;
 
 				if ($type === self::PUBLISH_HEADERS) {
-					$page->addStylesheetToHead(URL . '/extensions/' . MTB_GROUP . '/assets/' . MTB_GROUP . '.publish.css', 'screen');
-					$page->addScriptToHead(URL . '/extensions/' . MTB_GROUP . '/assets/' . MTB_GROUP . '.publish.js');
+					$page->addStylesheetToHead(URL . '/extensions/multilingual_field/assets/multilingual_field.publish.css', 'screen');
+					$page->addScriptToHead(URL . '/extensions/multilingual_field/assets/multilingual_field.publish.js');
 				}
 
 				if ($type === self::FILTER_HEADERS) {
@@ -256,10 +268,10 @@
 		public function dAddCustomPreferenceFieldsets($context) {
 			$group = new XMLElement('fieldset');
 			$group->setAttribute('class', 'settings');
-			$group->appendChild(new XMLElement('legend', __(MTB_NAME)));
+			$group->appendChild(new XMLElement('legend', __('Multilingual Text Box')));
 
 			$label = Widget::Label(__('Consolidate entry data'));
-			$label->appendChild(Widget::Input('settings[' . MTB_GROUP . '][consolidate]', 'yes', 'checkbox', array('checked' => 'checked')));
+			$label->appendChild(Widget::Input('settings[multilingual_field][consolidate]', 'yes', 'checkbox', array('checked' => 'checked')));
 			$group->appendChild($label);
 			$group->appendChild(new XMLElement('p', __('Check this field if you want to consolidate database by <b>keeping</b> entry values of removed/old Language Driver language codes. Entry values of current language codes will not be affected.'), array('class' => 'help')));
 
@@ -272,15 +284,15 @@
 		 * @param array $context
 		 */
 		public function dFLSavePreferences($context) {
-			$fields = Symphony::Database()->fetch(sprintf('SELECT `field_id` FROM `%s`', self::FIELD_TABLE));
+			if ($fields = Symphony::Database()->fetch("SELECT `field_id` FROM `{self::FIELD_TABLE}`")) {
+				$new_languages = $context['new_langs'];
 
-			if ($fields) {
 				// Foreach field check multilanguage values foreach language
 				foreach ($fields as $field) {
-					$entries_table = 'tbl_entries_data_' . $field["field_id"];
+					$entries_table = "tbl_entries_data_{$field["field_id"]}";
 
 					try {
-						$show_columns = Symphony::Database()->fetch("SHOW COLUMNS FROM `{$entries_table}` LIKE 'handle-%';");
+						$current_columns = Symphony::Database()->fetch("SHOW COLUMNS FROM `$entries_table` LIKE 'handle-%';");
 					} catch (DatabaseException $dbe) {
 						// Field doesn't exist. Better remove it's settings
 						Symphony::Database()->query(sprintf(
@@ -290,41 +302,45 @@
 						continue;
 					}
 
-					$columns = array();
+					$valid_columns = array();
 
 					// Remove obsolete fields
-					if ($show_columns) {
-						foreach ($show_columns as $column) {
-							$lc = substr($column['Field'], strlen($column['Field']) - 2);
+					if ($current_columns) {
+						$consolidate = $_POST['settings']['multilingual_field']['consolidate'] === 'yes';
 
-							// If not consolidate option AND column lang_code not in supported languages codes -> Drop Column
-							if (($_POST['settings'][MTB_GROUP]['consolidate'] !== 'yes') && !in_array($lc, $context['new_langs'])) {
-								Symphony::Database()->query(sprintf("
-									ALTER TABLE `%s`
-										DROP COLUMN `handle-{$lc}`,
-										DROP COLUMN `value-{$lc}`,
-										DROP COLUMN `value_formatted-{$lc}`,
-										DROP COLUMN `word_count-{$lc}`;",
-									$entries_table));
+						foreach ($current_columns as $column) {
+							$column_name = $column['Field'];
+
+							$lc = str_replace('handle-', '', $column_name);
+
+							// If not consolidate option AND column lang_code not in supported languages codes -> drop Column
+							if (!$consolidate && !in_array($lc, $new_languages)) {
+								Symphony::Database()->query(
+									"ALTER TABLE `$entries_table`
+										DROP COLUMN `handle-$lc`,
+										DROP COLUMN `value-$lc`,
+										DROP COLUMN `value_formatted-$lc`,
+										DROP COLUMN `word_count-$lc`;"
+								);
 							}
 							else {
-								$columns[] = $column['Field'];
+								$valid_columns[] = $column_name;
 							}
 						}
 					}
 
 					// Add new fields
-					foreach ($context['new_langs'] as $lc) {
-						// If column lang_code dosen't exist in the laguange drop columns
+					foreach ($new_languages as $lc) {
+						// if columns for language don't exist, create them
 
-						if (!in_array('handle-' . $lc, $columns)) {
-							Symphony::Database()->query(sprintf("
-								ALTER TABLE `%s`
-									ADD COLUMN `handle-{$lc}` varchar(255) default NULL,
-									ADD COLUMN `value-{$lc}` text default NULL,
-									ADD COLUMN `value_formatted-{$lc}` text default NULL,
-									ADD COLUMN `word_count-{$lc}` int(11) default NULL;",
-								$entries_table));
+						if (!in_array("handle-$lc", $valid_columns)) {
+							Symphony::Database()->query(
+								"ALTER TABLE `$entries_table`
+									ADD COLUMN `handle-$lc` varchar(255) default NULL,
+									ADD COLUMN `value-$lc` text default NULL,
+									ADD COLUMN `value_formatted-$lc` text default NULL,
+									ADD COLUMN `word_count-$lc` int(11) default NULL;"
+							);
 						}
 					}
 				}

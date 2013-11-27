@@ -144,42 +144,156 @@
 			));
 		}
 
+		/**
+		 * Returns required languages for this field.
+		 */
+		public function getRequiredLanguages() {
+			$required = $this->get('required_languages');
+
+			$languages = FLang::getLangs();
+
+			if (in_array('all', $required)) {
+				return $languages;
+			}
+
+			if (($key = array_search('main', $required)) !== false) {
+				unset($required[$key]);
+
+				$required[] = FLang::getMainLang();
+				$required   = array_unique($required);
+			}
+
+			return $required;
+		}
+
 
 
 		/*------------------------------------------------------------------------------------------------*/
 		/*  Settings  */
 		/*------------------------------------------------------------------------------------------------*/
 
-		public function findDefaults(&$fields) {
-			parent::findDefaults($fields);
+		public function findDefaults(&$settings) {
+			parent::findDefaults($settings);
 
-			$fields['def_ref_lang'] = 'no';
+			$settings['default_main_lang'] = 'no';
+		}
+
+		public function set($field, $value) {
+			if ($field == 'required_languages' && !is_array($value)) {
+				$value = array_filter(explode(',', $value));
+			}
+
+			$this->_fields[$field] = $value;
+		}
+
+		public function get($field = null) {
+			if ($field == 'required_languages') {
+				return (array) parent::get($field);
+			}
+
+			return parent::get($field);
 		}
 
 		public function displaySettingsPanel(XMLElement &$wrapper, $errors = null) {
 			parent::displaySettingsPanel($wrapper, $errors);
 
-			foreach ($wrapper->getChildrenByName('ul') as $list) {
-				/* @var XMLElement $list */
+			/*
+			 * UI is like this:
+			 *
+			 * ................................................................................
+			 * [Checkbox] Required                        [Checkbox] Display in Entries table
+			 *
+			 *
+			 * It must become like this:
+			 *
+			 * ................................................................................
+			 * [Checkbox] Require all languages           [Select]   Require only these languages
+			 * [Checkbox] Default to main lang            [Checkbox] Display in entries table
+			 */
 
-				if ($list->getAttribute('class') === 'options-list') {
-					$item = new XMLElement('li');
+			// this is the div with current required checkbox. Remove current required checkbox.
+			$last_div_pos       = $wrapper->getNumberOfChildren() - 1;
+			$last_div           = $wrapper->getChild($last_div_pos);
+			$display_in_table_1 = $last_div->getChild(2);
+			$display_in_table_2 = $last_div->getChild(3);
 
-					$input = Widget::Input("fields[{$this->get('sortorder')}][def_ref_lang]", 'yes', 'checkbox');
-					if ($this->get('def_ref_lang') == 'yes') {
-						$input->setAttribute('checked', 'checked');
-					}
+			// Default to main lang && Display in entries table
+			$two_columns = new XMLELement('div', null, array('class' => 'two columns'));
+			$this->settingsDefaultMainLang($two_columns);
+			$two_columns->appendChild($display_in_table_1);
+			$two_columns->appendChild($display_in_table_2);
+			$wrapper->replaceChildAt($last_div_pos, $two_columns);
 
-					$item->appendChild(Widget::Label(
-						__('%s Use value from main language if selected language has empty value.', array($input->generate()))
-					));
+			// Require all languages && Require custom languages
+			$two_columns = new XMLELement('div', null, array('class' => 'two columns'));
+			$this->settingsRequiredLanguages($two_columns);
+			$wrapper->appendChild($two_columns);
+		}
 
-					$list->appendChild($item);
-				}
+		private function settingsDefaultMainLang(XMLElement &$wrapper) {
+			$name = "fields[{$this->get('sortorder')}][default_main_lang]";
+
+			$wrapper->appendChild(Widget::Input($name, 'no', 'hidden'));
+
+			$label = Widget::Label();
+			$label->setAttribute('class', 'column');
+			$input = Widget::Input($name, 'yes', 'checkbox');
+
+			if ($this->get('default_main_lang') == 'yes') {
+				$input->setAttribute('checked', 'checked');
 			}
+
+			$label->setValue(__('%s Use value from main language if selected language has empty value.', array($input->generate())));
+
+			$wrapper->appendChild($label);
+		}
+
+		private function settingsRequiredLanguages(XMLElement &$wrapper) {
+			$name = "fields[{$this->get('sortorder')}][required_languages][]";
+
+			$required_languages = $this->get('required_languages');
+
+			$displayed_languages = FLang::getLangs();
+
+			if (($key = array_search(FLang::getMainLang(), $displayed_languages)) !== false) {
+				unset($displayed_languages[$key]);
+			}
+
+			$options = Extension_Languages::findOptions($required_languages, $displayed_languages);
+
+			array_unshift(
+				$options,
+				array('all', $this->get('required') == 'yes', __('All')),
+				array('main', in_array('main', $required_languages), __('Main language'))
+			);
+
+			$label = Widget::Label(__('Required languages'));
+			$label->setAttribute('class', 'column');
+			$label->appendChild(
+				Widget::Select($name, $options, array('multiple' => 'multiple'))
+			);
+
+			$wrapper->appendChild($label);
 		}
 
 		public function commit() {
+			$required_languages = $this->get('required_languages');
+
+			// all are required
+			if (in_array('all', $required_languages)) {
+				$this->set('required', 'yes');
+				$required_languages = array('all');
+			}
+
+			// if main is required, remove the actual language code
+			if (in_array('main', $required_languages)) {
+				if (($key = array_search(FLang::getMainLang(), $required_languages)) !== false) {
+					unset($required_languages[$key]);
+				}
+			}
+
+			$this->set('required_languages', $required_languages);
+
 			if (!parent::commit()) {
 				return false;
 			}
@@ -188,10 +302,14 @@
 				UPDATE
 					`tbl_fields_%s`
 				SET
-					`def_ref_lang` = '%s'
+					`default_main_lang` = '%s',
+					`required_languages` = '%s'
 				WHERE
 					`field_id` = '%s';",
-				$this->handle(), $this->get('def_ref_lang') === 'yes' ? 'yes' : 'no', $this->get('id')
+				$this->handle(),
+				$this->get('default_main_lang') === 'yes' ? 'yes' : 'no',
+				implode(',', $this->get('required_languages')),
+				$this->get('id')
 			));
 		}
 
@@ -345,20 +463,17 @@
 		/*------------------------------------------------------------------------------------------------*/
 
 		public function checkPostFieldData($data, &$message, $entry_id = null) {
-			$error      = self::__OK__;
-			$field_data = $data;
-			$all_langs  = FLang::getAllLangs();
-			$main_lang  = FLang::getMainLang();
+			$error              = self::__OK__;
+			$all_langs          = FLang::getAllLangs();
+			$main_lang          = FLang::getMainLang();
+			$required_languages = $this->getRequiredLanguages();
+			$original_required  = $this->get('required');
 
 			foreach (FLang::getLangs() as $lc) {
-
-				$file_message = '';
-				$data         = $field_data[$lc];
-
-				$status = parent::checkPostFieldData($data, $file_message, $entry_id);
+				$this->set('required', in_array($lc, $required_languages) ? 'yes' : 'no');
 
 				// if one language fails, all fail
-				if ($status != self::__OK__) {
+				if (self::__OK__ != parent::checkPostFieldData($data[$lc], $file_message, $entry_id)) {
 
 					$local_msg = "<br />[$lc] {$all_langs[$lc]}: {$file_message}";
 
@@ -372,6 +487,8 @@
 					$error = self::__ERROR__;
 				}
 			}
+
+			$this->set('required', $original_required);
 
 			return $error;
 		}
@@ -485,7 +602,7 @@
 				$lc = FLang::getLangCode();
 
 				// If value is empty for this language, load value from main language
-				if ($this->get('def_ref_lang') == 'yes' && empty($data["value-$lc"])) {
+				if ($this->get('default_main_lang') == 'yes' && empty($data["value-$lc"])) {
 					$lc = FLang::getMainLang();
 				}
 
@@ -516,7 +633,7 @@
 			}
 
 			// If value is empty for this language, load value from main language
-			if ($this->get('def_ref_lang') == 'yes' && empty($data["value-$lc"])) {
+			if ($this->get('default_main_lang') == 'yes' && empty($data["value-$lc"])) {
 				$lc = FLang::getMainLang();
 			}
 
@@ -530,7 +647,7 @@
 			$lc = FLang::getLangCode();
 
 			// If value is empty for this language, load value from main language
-			if ($this->get('def_ref_lang') === 'yes' && empty($data["value-$lc"])) {
+			if ($this->get('default_main_lang') === 'yes' && empty($data["value-$lc"])) {
 				$lc = FLang::getMainLang();
 			}
 
@@ -645,9 +762,19 @@
 		/*  Field schema  */
 		/*------------------------------------------------------------------------------------------------*/
 
-		public function appendFieldSchema($f) { }
+		public function appendFieldSchema(XMLElement $f) {
+			$required_languages = $this->getRequiredLanguages();
 
-		public function prepareImportValue($data, $mode, $entry_id = null) {
-			// @todo this must be implemented
+			$required = new XMLElement('required-languages');
+
+			foreach ($required_languages as $lc) {
+				$required->appendChild(new XMLElement('item', $lc));
+			}
+
+			$f->appendChild($required);
 		}
+
+//		public function prepareImportValue($data, $mode, $entry_id = null) {
+//
+//		}
 	}
