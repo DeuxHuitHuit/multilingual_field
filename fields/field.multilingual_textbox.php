@@ -570,13 +570,7 @@
 					$data['value_formatted'] = $data["value_formatted-$lc"];
 					$data['word_count']      = $data["word_count-$lc"];
 
-					$attributes = array(
-						'lang' => $lc
-					);
-
-					$item = new XMLElement(
-						'item', null, $attributes
-					);
+					$item = new XMLElement('item', null, array('lang' => $lc));
 
 					parent::appendFormattedElement($item, $data, $encode, $submode);
 
@@ -616,6 +610,8 @@
 				$elem = $wrapper->getChildByName($this->get('element_name'), 0);
 
 				if (!is_null($elem)) {
+					$elem->setAttribute('lang', $lc);
+
 					if ($this->get('text_handle') === 'yes') {
 						foreach (FLang::getLangs() as $lc) {
 							$elem->setAttribute("handle-$lc", $data["handle-$lc"]);
@@ -773,7 +769,6 @@
 
 			$f->appendChild($required);
 		}
-
 //		public function prepareImportValue($data, $mode, $entry_id = null) {
 //
 //		}
