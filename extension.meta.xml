@@ -27,6 +27,10 @@
 	</dependencies>
 
 	<releases>
+		<release version="3.1" date="2013-11-28" min="2.3">
+			* Add language code to output element.
+		</release>
+
 		<release version="3.0" date="2013-11-26" min="2.3">
 			* Allow textarea to be resized only on vertical axis.
 			* Added language code to error message. Useful to process automatically in frontend forms.
