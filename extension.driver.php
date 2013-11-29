@@ -284,7 +284,7 @@
 		 * @param array $context
 		 */
 		public function dFLSavePreferences($context) {
-			if ($fields = Symphony::Database()->fetch("SELECT `field_id` FROM `{self::FIELD_TABLE}`")) {
+			if ($fields = Symphony::Database()->fetch(sprintf("SELECT `field_id` FROM `%s`", self::FIELD_TABLE))) {
 				$new_languages = $context['new_langs'];
 
 				// Foreach field check multilanguage values foreach language
