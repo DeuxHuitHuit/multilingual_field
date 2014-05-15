@@ -183,7 +183,7 @@
 				$value = array_filter(explode(',', $value));
 			}
 
-			$this->_fields[$field] = $value;
+			$this->_settings[$field] = $value;
 		}
 
 		public function get($field = null) {
