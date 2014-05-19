@@ -472,6 +472,11 @@
 			foreach (FLang::getLangs() as $lc) {
 				$this->set('required', in_array($lc, $required_languages) ? 'yes' : 'no');
 
+				// ignore missing languages
+				if (!isset($data[$lc]) && $entry_id) {
+					continue;
+				}
+
 				// if one language fails, all fail
 				if (self::__OK__ != parent::checkPostFieldData($data[$lc], $file_message, $entry_id)) {
 
@@ -502,9 +507,16 @@
 			$result     = array();
 			$field_data = $data;
 
+			$missing_langs = array();
+
 			foreach (FLang::getLangs() as $lc) {
 
-				$data = isset($field_data[$lc]) ? $field_data[$lc] : '';
+				if (!isset($field_data[$lc])) {
+					$missing_langs[] = $lc;
+					continue;
+				}
+
+				$data = $field_data[$lc];
 
 				$formatted = $this->applyFormatting($data);
 
@@ -527,7 +539,31 @@
 				}
 			}
 
+			if (!empty($missing_langs) && $entry_id) {
+				$crt_data = $this->getCurrentData($entry_id);
+
+				foreach ($missing_langs as $lc) {
+					$result = array_merge($result, array(
+						"handle-$lc"          => $crt_data["handle-$lc"],
+						"value-$lc"           => $crt_data["value-$lc"],
+						"value_formatted-$lc" => $crt_data["value_formatted-$lc"],
+						"word_count-$lc"      => $crt_data["word_count-$lc"]
+					));
+				}
+			}
+
 			return $result;
+		}
+
+		private function getCurrentData($entry_id) {
+			$query = sprintf(
+				'SELECT * FROM `tbl_entries_data_%d`
+				WHERE `entry_id` = %d',
+				$this->get('id'),
+				$entry_id
+			);
+
+			return Symphony::Database()->fetchRow(0, $query);
 		}
 
 
@@ -651,20 +687,16 @@
 		}
 
 		public function getExampleFormMarkup() {
-			$label = Widget::Label($this->get('label') . '
-				<!--' . __('Modify just current language value') . '-->
-					<input name = "fields[' . $this->get('element_name') . '][value-{$url-fl-language}]" type ="text" />
-
-					<!--' . __('Modify all values') . '-->');
+			$label = Widget::Label($this->get('label'));
 
 			if ($this->get('text_size') === 'single') {
 				foreach (FLang::getLangs() as $lc) {
-					$label->appendChild(Widget::Input("fields[{$this->get('element_name')}][value-{$lc}]"));
+					$label->appendChild(Widget::Input("fields[{$this->get('element_name')}][{$lc}]"));
 				}
 			}
 			else {
 				foreach (FLang::getLangs() as $lc) {
-					$label->appendChild(Widget::Textarea("fields[{$this->get('element_name')}][value-{$lc}]", 20, 50));
+					$label->appendChild(Widget::Textarea("fields[{$this->get('element_name')}][{$lc}]", 20, 50));
 				}
 			}
 
