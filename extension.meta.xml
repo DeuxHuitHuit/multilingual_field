@@ -27,6 +27,10 @@
 	</dependencies>
 
 	<releases>
+		<release version="3.3" date="2014-05-19" min="2.3.4">
+			* Added update on per language basis.
+		</release>
+
 		<release version="3.2" date="2013-11-29" min="2.3.4">
 			* Fixed query.
 		</release>
