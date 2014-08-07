@@ -1,20 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension id="multilingual_field" status="released" xmlns="http://symphony-cms.com/schemas/extension/1.0">
 	<name>Multilingual Text Box</name>
-
 	<description>The multilingual version of Textbox field.</description>
-
 	<repo type="github">https://github.com/vlad-ghita/multilingual_field</repo>
-
 	<url type="discuss">http://symphony-cms.com/discuss/thread/46067/</url>
 
 	<types>
 		<type>Field</type>
 		<type>Field Types</type>
+		<type>Text Box</type>
 		<type>Multilingual</type>
 	</types>
 
 	<authors>
+		<author>
+			<name github="DeuxHuitHuit" symphony="nitriques" twitter="DeuxHuitHuit">Deux Huit Huit</name>
+			<website>http://deuxhuithuit.com</website>
+		</author>
 		<author>
 			<name github="vlad-ghita" symphony="vladG">Vlad Ghita</name>
 			<email>vlad_micutul@yahoo.com</email>
@@ -23,10 +25,13 @@
 	</authors>
 
 	<dependencies>
-		<dependency version="2.5">http://github.com/vlad-ghita/frontend_localisation</dependency>
+		<dependency version="2.5">http://github.com/DeuxHuitHuit/frontend_localisation</dependency>
 	</dependencies>
 
 	<releases>
+		<release version="3.3.1" date="2014-08-06" min="2.4" max="2.5">
+			* Marked as 2.5 compatible
+		</release>
 		<release version="3.3" date="2014-05-19" min="2.4">
 			* Added update on per language basis.
 		</release>
@@ -88,7 +93,7 @@
 	</releases>
 
 	<media>
-		<item type="image" url="http://symphony-cms.com/workspace/downloads/extensions/images/Imagen-17-1276279701.png">Multilingual Text Field preview.</item>
+		<item type="image" url="http://getsymphony.com/workspace/downloads/extensions/images/Imagen-17-1276279701.png">Multilingual Text Field preview.</item>
 	</media>
 
 </extension>
