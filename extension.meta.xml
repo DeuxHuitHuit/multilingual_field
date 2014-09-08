@@ -29,6 +29,9 @@
 	</dependencies>
 
 	<releases>
+		<release version="3.3.2" date="2014-09-08" min="2.4" max="2.5">
+			* Fixed a regression bug where the "display in entries table" checkbox was missing.
+		</release>
 		<release version="3.3.1" date="2014-08-06" min="2.4" max="2.5">
 			* Marked as 2.5 compatible
 		</release>
