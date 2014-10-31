@@ -387,7 +387,7 @@
 
 			foreach ($langs as $lc) {
 				$div = new XMLElement('div', null, array(
-					'class'          => 'file tab-panel tab-' . $lc,
+					'class'          => 'tab-panel tab-' . $lc,
 					'data-lang_code' => $lc
 				));
 
