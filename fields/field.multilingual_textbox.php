@@ -689,7 +689,9 @@
 			}
 		}
 
+		// @todo: remove and fallback to default (Symphony 2.5 only?)
 		public function prepareTableValue($data, XMLElement $link = null) {
+			$required_languages = $this->getRequiredLanguages();
 			$lc = Lang::get();
 
 			if (!FLang::validateLangCode($lc)) {
@@ -701,10 +703,38 @@
 				$lc = FLang::getMainLang();
 			}
 
+			// If value if still empty try to use the value from the first
+			// required language
+			if (empty($data["value-$lc"]) && count($required_languages) > 0) {
+				$lc = $required_languages[0];
+			}
+
 			$data['value']           = $data["value-$lc"];
 			$data['value_formatted'] = $data["value_formatted-$lc"];
 
 			return parent::prepareTableValue($data, $link);
+		}
+
+		public function prepareTextValue($data, $entry_id = null) {
+			$required_languages = $this->getRequiredLanguages();
+			$lc = Lang::get();
+
+			if (!FLang::validateLangCode($lc)) {
+				$lc = FLang::getLangCode();
+			}
+
+			// If value is empty for this language, load value from main language
+			if ($this->get('default_main_lang') == 'yes' && empty($data["value-$lc"])) {
+				$lc = FLang::getMainLang();
+			}
+
+			// If value if still empty try to use the value from the first
+			// required language
+			if (empty($data["value-$lc"]) && count($required_languages) > 0) {
+				$lc = $required_languages[0];
+			}
+
+			return strip_tags($data["value-$lc"]);
 		}
 
 		public function getParameterPoolValue($data) {
