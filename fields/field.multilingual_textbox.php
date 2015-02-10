@@ -345,17 +345,45 @@
 
 			$label    = Widget::Label($this->get('label'));
 			$optional = '';
+			$required_languages = $this->getRequiredLanguages();
+			
+			$required = in_array('all', $required_languages) || count($langs) == count($required_languages);
 
-			if ($this->get('required') != 'yes') {
-				if ((integer) $this->get('text_length') > 0) {
-					$optional = __('$1 of $2 remaining') . ' &ndash; ' . __('Optional');
-				}
-				else {
-					$optional = __('Optional');
-				}
-			}
-			elseif ((integer) $this->get('text_length') > 0) {
+			$append_dash = false;
+			if ((integer) $this->get('text_length') > 0) {
 				$optional = __('$1 of $2 remaining');
+				$append_dash = true;
+			}
+
+			if (!$required) {
+				if ($append_dash) {
+					$optional .= ' &ndash; ';
+				}
+				
+				if (empty($required_languages)) {
+					$optional .= __('All languages are optional');
+				} else {
+					$optional_langs = array();
+					foreach ($langs as $lang) {
+						if (!in_array($lang, $required_languages)) {
+							$optional_langs[] = $all_langs[$lang];
+						}
+					}
+					
+					foreach ($optional_langs as $idx => $lang) {
+						$optional .= ' ' . __($lang);
+						if ($idx < count($optional_langs) - 2) {
+							$optional .= ',';
+						} else if ($idx < count($optional_langs) - 1) {
+							$optional .= ' ' . __('and');
+						}
+					}
+					if (count($optional_langs) > 1) {
+						$optional .= __(' are optional');
+					} else {
+						$optional .= __(' is optional');
+					}
+				}
 			}
 
 			if ($optional !== '') {
