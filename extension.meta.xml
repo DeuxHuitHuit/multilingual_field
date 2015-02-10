@@ -29,7 +29,12 @@
 	</dependencies>
 
 	<releases>
-		<release version="3.3.2" date="2014-09-08" min="2.4" max="2.5">
+		<release version="3.3.3" date="2015-02-10" min="2.4.x" max="2.6.x">
+			* Improved optional support
+			* Improved publish display of optional values
+			* Marked as 2.6 compatible
+		</release>
+		<release version="3.3.2" date="2014-09-08" min="2.4.x" max="2.5.x">
 			* Fixed a regression bug where the "display in entries table" checkbox was missing.
 		</release>
 		<release version="3.3.1" date="2014-08-06" min="2.4" max="2.5">
