@@ -197,6 +197,10 @@
 		public function displaySettingsPanel(XMLElement &$wrapper, $errors = null) {
 			parent::displaySettingsPanel($wrapper, $errors);
 
+			Extension_Multilingual_Field::appendHeaders(
+				Extension_Multilingual_Field::SETTINGS_HEADERS
+			);
+
 			/*
 			 * UI is like this:
 			 *

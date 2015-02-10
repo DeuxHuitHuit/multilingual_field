@@ -10,7 +10,7 @@
 
 		const FIELD_TABLE = 'tbl_fields_multilingual_textbox';
 
-
+		const SETTINGS_HEADERS = 4;
 
 		/*------------------------------------------------------------------------------------------------*/
 		/*  Installation  */
@@ -227,6 +227,10 @@
 
 				if ($type === self::FILTER_HEADERS) {
 					$page->addStylesheetToHead(URL . '/extensions/textboxfield/assets/textboxfield.settings.css', 'screen');
+				}
+				
+				if ($type === self::SETTINGS_HEADERS) {
+					$page->addScriptToHead(URL . '/extensions/multilingual_field/assets/multilingual_field.settings.js');
 				}
 
 				self::$appendedHeaders &= $type;
