@@ -50,6 +50,34 @@
 		$('.field-multilingual_textbox.instance select[name*="[required_languages]"]')
 			.on('change', change)
 			.trigger('change');
+
+		if (!!Symphony.Context.get().version) {
+			Symphony.Elements.contents.find('.instance.field-textbox').each(function () {
+				var $field = $(this);
+				var $header = $field.find('.frame-header');
+				$header.append(
+					$('<a />').attr('class', 'field-multilingual_textbox-converter debug')
+						.attr('style', 'right: 11rem;font-size: 0.9em;')
+						.text(Symphony.Language.get('Convert to multilingual'))
+				);
+			}).on('click', '.field-multilingual_textbox-converter', function (e) {
+				var $field = $(this).closest('.field-textbox');
+				var id = $field.find('input[name$=\\[id\\]]').val();
+				
+				e.stopPropagation();
+				if (!confirm(Symphony.Language.get('Are you sure?'))) {
+					return false;
+				}
+				
+				$.post(Symphony.Context.get('path') + '/extension/multilingual_field/convert/' + id + '/')
+					.done(function (data) {
+						if (data && data.ok) {
+							window.location.reload();
+						}
+					});
+				return;
+			});
+		}
 	});
 
 })(jQuery);

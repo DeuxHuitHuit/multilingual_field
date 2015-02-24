@@ -19,6 +19,27 @@
 			$this->_name = 'Multilingual Text Box';
 		}
 
+		public static function generateTableColumns() {
+			$cols = array();
+			foreach (FLang::getLangs() as $lc) {
+				$cols[] = "`handle-{$lc}` VARCHAR(255) DEFAULT NULL,";
+				$cols[] = "`value-{$lc}` TEXT default NULL,";
+				$cols[] = "`value_formatted-{$lc}` TEXT default NULL,";
+				$cols[] = "`word_count-{$lc}` INT(11) UNSIGNED DEFAULT NULL,";
+			}
+			return $cols;
+		}
+
+		public static function generateTableKeys() {
+			$keys = array();
+			foreach (FLang::getLangs() as $lc) {
+				$keys[] = "KEY `handle-{$lc}` (`handle-{$lc}`),";
+				$keys[] = "FULLTEXT KEY `value-{$lc}` (`value-{$lc}`),";
+				$keys[] = "FULLTEXT KEY `value_formatted-{$lc}` (`value_formatted-{$lc}`),";
+			}
+			return $keys;
+		}
+
 		public function createTable() {
 			$field_id = $this->get('id');
 
@@ -31,24 +52,13 @@
 					`value_formatted` TEXT DEFAULT NULL,
 					`word_count` INT(11) UNSIGNED DEFAULT NULL,";
 
-			foreach (FLang::getLangs() as $lc) {
-				$query .= "
-					`handle-{$lc}` VARCHAR(255) DEFAULT NULL,
-				    `value-{$lc}` TEXT default NULL,
-				    `value_formatted-{$lc}` TEXT default NULL,
-				    `word_count-{$lc}` INT(11) UNSIGNED DEFAULT NULL,";
-			}
+			$query .= implode('', self::generateTableColumns());
 
 			$query .= "
 					PRIMARY KEY (`id`),
 					KEY `entry_id` (`entry_id`),";
 
-			foreach (FLang::getLangs() as $lc) {
-				$query .= "
-					KEY `handle-{$lc}` (`handle-{$lc}`),
-					FULLTEXT KEY `value-{$lc}` (`value-{$lc}`),
-					FULLTEXT KEY `value_formatted-{$lc}` (`value_formatted-{$lc}`),";
-			}
+			$query .= implode('', self::generateTableKeys());
 
 			$query .= "
 					KEY `handle` (`handle`),

@@ -17,7 +17,7 @@
 			}
 		};
 
-		$('div.field-multilingual_textbox').each(function () {
+		Symphony.Elements.contents.find('div.field-multilingual_textbox').each(function () {
 			var $field = $(this);
 
 			$field.find('i').each(function () {
