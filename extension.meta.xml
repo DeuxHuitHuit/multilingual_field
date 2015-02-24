@@ -29,6 +29,9 @@
 	</dependencies>
 
 	<releases>
+		<release version="3.4.0" date="2015-02-10" min="2.4.x" max="2.6.x">
+			* Added "Convert textbox to multingual" feature (Symphony 2.6.x compatible only)
+		</release>
 		<release version="3.3.3" date="2015-02-10" min="2.4.x" max="2.6.x">
 			* Improved optional support
 			* Improved publish display of optional values
