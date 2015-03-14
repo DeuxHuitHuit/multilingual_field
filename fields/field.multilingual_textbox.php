@@ -228,14 +228,12 @@
 			// this is the div with current required checkbox. Remove current required checkbox.
 			$last_div_pos       = $wrapper->getNumberOfChildren() - 1;
 			$last_div           = $wrapper->getChild($last_div_pos);
-			$display_in_table_1 = $last_div->getChild(0)->getChild(2);
-			$display_in_table_2 = $last_div->getChild(0)->getChild(3);
 
 			// Default to main lang && Display in entries table
 			$two_columns = new XMLELement('div', null, array('class' => 'two columns'));
 			$this->settingsDefaultMainLang($two_columns);
-			$two_columns->appendChild($display_in_table_1);
-			$two_columns->appendChild($display_in_table_2);
+			$this->appendRequiredCheckbox($two_columns);
+			$this->appendShowColumnCheckbox($two_columns);
 			$wrapper->replaceChildAt($last_div_pos, $two_columns);
 
 			// Require all languages && Require custom languages
