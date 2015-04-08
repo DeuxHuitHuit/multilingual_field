@@ -31,6 +31,8 @@
 	<releases>
 		<release version="3.4.1" date="2015-04-08" min="2.4.x" max="2.6.x">
 			* Made the `entry_id` column unique
+			* Fixed issue with display in entries table checkbox
+			* Fixed SQL query when no lang is available
 		</release>
 		<release version="3.4.0" date="2015-02-10" min="2.4.x" max="2.6.x">
 			* Added "Convert textbox to multingual" feature (Symphony 2.6.x compatible only)
