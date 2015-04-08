@@ -56,7 +56,7 @@
 
 			$query .= "
 					PRIMARY KEY (`id`),
-					KEY `entry_id` (`entry_id`),";
+					UNIQUE KEY `entry_id` (`entry_id`),";
 
 			$query .= implode('', self::generateTableKeys());
 
