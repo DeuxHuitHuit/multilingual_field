@@ -785,11 +785,13 @@
 			parent::buildDSRetrievalSQL($data, $joins, $multi_where, $andOperation);
 
 			$lc = FLang::getLangCode();
+			
+			if ($lc) {
+				$multi_where = str_replace('.value', ".`value-$lc`", $multi_where);
+				$multi_where = str_replace('.handle', ".`handle-$lc`", $multi_where);
 
-			$multi_where = str_replace('.value', ".`value-$lc`", $multi_where);
-			$multi_where = str_replace('.handle', ".`handle-$lc`", $multi_where);
-
-			$where .= $multi_where;
+				$where .= $multi_where;
+			}
 
 			return true;
 		}
@@ -802,12 +804,12 @@
 
 		public function buildSortingSQL(&$joins, &$where, &$sort, $order = 'ASC') {
 			$lc = FLang::getLangCode();
-
+			
 			if (in_array(strtolower($order), array('random', 'rand'))) {
 				$sort = 'ORDER BY RAND()';
 			}
 
-			else {
+			else if ($lc != null) {
 				$sort = sprintf('
 					ORDER BY(
 						SELECT `%s`
@@ -818,6 +820,9 @@
 					$this->get('id'),
 					$order
 				);
+			}
+			else {
+				parent::buildSortingSQL($joins, $where, $sort, $order);
 			}
 		}
 
