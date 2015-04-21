@@ -296,6 +296,9 @@
 				$this->set('required', 'yes');
 				$required_languages = array('all');
 			}
+			else {
+				$this->set('required', 'no');
+			}
 
 			// if main is required, remove the actual language code
 			if (in_array('main', $required_languages)) {
