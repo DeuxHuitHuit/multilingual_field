@@ -182,7 +182,7 @@
 		/*  Settings  */
 		/*------------------------------------------------------------------------------------------------*/
 
-		public function findDefaults(&$settings) {
+		public function findDefaults(array &$settings) {
 			parent::findDefaults($settings);
 
 			$settings['default_main_lang'] = 'no';
