@@ -29,6 +29,10 @@
 	</dependencies>
 
 	<releases>
+		<release version="3.5.0" date="2015-05-13" min="2.4.x" max="2.6.x">
+			* Added more support for showing the right language in the backend
+			* Added support for the multilingual_selectbox_link_field extension
+		</release>
 		<release version="3.4.2" date="2015-04-22" min="2.4.x" max="2.6.x">
 			* Fixed a bug in the field settings with required languages
 		</release>
