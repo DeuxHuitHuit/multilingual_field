@@ -29,6 +29,9 @@
 	</dependencies>
 
 	<releases>
+		<release version="3.5.1" date="2015-06-03" min="2.4.x" max="2.6.x">
+			* Removed confusing required checkbox
+		</release>
 		<release version="3.5.0" date="2015-05-13" min="2.4.x" max="2.6.x">
 			* Added more support for showing the right language in the backend
 			* Added support for the multilingual_selectbox_link_field extension
