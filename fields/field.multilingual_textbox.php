@@ -232,7 +232,6 @@
 			// Default to main lang && Display in entries table
 			$two_columns = new XMLELement('div', null, array('class' => 'two columns'));
 			$this->settingsDefaultMainLang($two_columns);
-			$this->appendRequiredCheckbox($two_columns);
 			$this->appendShowColumnCheckbox($two_columns);
 			$wrapper->replaceChildAt($last_div_pos, $two_columns);
 
