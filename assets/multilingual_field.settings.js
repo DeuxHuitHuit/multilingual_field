@@ -74,6 +74,12 @@
 						if (data && data.ok) {
 							window.location.reload();
 						}
+						else if (data.error) {
+							alert(data.error);
+						}
+						else {
+							alert('Unknown error.');
+						}
 					});
 				return;
 			});
