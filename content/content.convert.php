@@ -62,9 +62,15 @@
 				$query = trim($query, ',');
 				Symphony::Database()->query($query);
 				
+				// Check for languages
+				$langs = FLang::getLangs();
+				if (empty($langs)) {
+					throw new Exception('No language found. Please check that you have at least one.');
+				}
+				
 				// Copy values
 				$query = "UPDATE `$entries_table` SET ";
-				foreach (FLang::getLangs() as $lc) {
+				foreach ($langs as $lc) {
 					$query .= " `handle-$lc` = `handle`,
 						 `value-$lc` = `value`,
 						 `value_formatted-$lc` = `value_formatted`,
