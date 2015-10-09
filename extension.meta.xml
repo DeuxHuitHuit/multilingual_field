@@ -29,6 +29,10 @@
 	</dependencies>
 
 	<releases>
+		<release version="3.5.2" date="2015-10-09" min="2.4.x" max="2.6.x">
+			* Validate that there are languages before converting
+			* Make sure the user gets notified in case of error
+		</release>
 		<release version="3.5.1" date="2015-06-03" min="2.4.x" max="2.6.x">
 			* Removed confusing required checkbox
 		</release>
