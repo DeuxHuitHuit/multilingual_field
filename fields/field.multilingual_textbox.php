@@ -823,9 +823,9 @@
 			if ($lc) {
 				$multi_where = str_replace('.value', ".`value-$lc`", $multi_where);
 				$multi_where = str_replace('.handle', ".`handle-$lc`", $multi_where);
-
-				$where .= $multi_where;
 			}
+
+			$where .= $multi_where;
 
 			return true;
 		}
