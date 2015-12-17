@@ -225,10 +225,6 @@
 					$page->addScriptToHead(URL . '/extensions/multilingual_field/assets/multilingual_field.publish.js');
 				}
 
-				if ($type === self::FILTER_HEADERS) {
-					$page->addStylesheetToHead(URL . '/extensions/textboxfield/assets/textboxfield.settings.css', 'screen');
-				}
-				
 				if ($type === self::SETTINGS_HEADERS) {
 					$page->addScriptToHead(URL . '/extensions/multilingual_field/assets/multilingual_field.settings.js');
 				}
