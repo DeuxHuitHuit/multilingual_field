@@ -25,6 +25,7 @@
 	</authors>
 	<dependencies>
 		<dependency version="2.5">http://github.com/DeuxHuitHuit/frontend_localisation</dependency>
+		<dependency version="2.4.0">https://github.com/symphonists/textboxfield</dependency>
 	</dependencies>
 	<releases>
 		<release version="3.5.4" date="2016-03-07" min="2.4.x" max="2.x.x">
