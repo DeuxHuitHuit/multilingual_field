@@ -19,7 +19,7 @@
 			var langs = [];
 			values.each(function (index, elem) {
 				var text = $(this).text();
-				langs.push(text);
+				langs.push(text.split(' ||')[0]);
 				if (index < values.length - 2) {
 					langs.push(', ');
 				} else if (index < values.length - 1) {
