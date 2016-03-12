@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension id="multilingual_field" status="released" xmlns="http://getsymphony.com/schemas/extension/1.0">
-	<name>Multilingual Text Box</name>
+	<name>Field: Multilingual Text Box</name>
 	<description>The multilingual version of Textbox field.</description>
 	<repo type="github">https://github.com/vlad-ghita/multilingual_field</repo>
 	<url type="discuss">http://www.getsymphony.com/discuss/thread/46067/</url>
