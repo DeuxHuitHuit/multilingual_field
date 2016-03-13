@@ -358,9 +358,9 @@
 			/*------------------------------------------------------------------------------------------------*/
 
 			$label    = Widget::Label($this->get('label'));
+			$title = '';
 			$optional = '';
 			$required_languages = $this->getRequiredLanguages();
-			
 			$required = in_array('all', $required_languages) || count($langs) == count($required_languages);
 
 			$append_dash = false;
@@ -398,13 +398,17 @@
 						$optional .= __(' is optional');
 					}
 				}
+				if ($this->get('default_main_lang') == 'yes') {
+					$title .= __('Empty values defaults to %s', array($all_langs[$main_lang]));
+				}
 			}
 
 			if ($optional !== '') {
 				foreach ($langs as $lc) {
 					$label->appendChild(new XMLElement('i', $optional, array(
 						'class'          => "tab-element tab-$lc",
-						'data-lang_code' => $lc
+						'data-lang_code' => $lc,
+						'title' => $title
 					)));
 				}
 			}
