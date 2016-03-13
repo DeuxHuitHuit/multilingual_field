@@ -28,6 +28,9 @@
 		<dependency version="2.4.0">https://github.com/symphonists/textboxfield</dependency>
 	</dependencies>
 	<releases>
+		<release version="3.5.5" date="2016-03-14" min="2.4.x" max="2.x.x">
+			* Added a title to hint about default value
+		</release>
 		<release version="3.5.4" date="2016-03-07" min="2.4.x" max="2.x.x">
 			* Updated compatibility info
 		</release>
