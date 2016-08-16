@@ -40,6 +40,12 @@
 			}
 			
 			try {
+				// Check for languages
+				$langs = FLang::getLangs();
+				if (empty($langs)) {
+					throw new Exception('No language found. Please check that you have at least one.');
+				}
+				
 				$column_length = MySQL::cleanValue($field->get('column_length'));
 				$text_size = MySQL::cleanValue($field->get('text_size'));
 				$text_formatter = MySQL::cleanValue($field->get('text_formatter'));
@@ -61,12 +67,6 @@
 				}
 				$query = trim($query, ',');
 				Symphony::Database()->query($query);
-				
-				// Check for languages
-				$langs = FLang::getLangs();
-				if (empty($langs)) {
-					throw new Exception('No language found. Please check that you have at least one.');
-				}
 				
 				// Copy values
 				$query = "UPDATE `$entries_table` SET ";
