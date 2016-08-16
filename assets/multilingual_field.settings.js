@@ -69,7 +69,7 @@
 					return false;
 				}
 				
-				$.post(Symphony.Context.get('path') + '/extension/multilingual_field/convert/' + id + '/')
+				$.post(Symphony.Context.get('symphony') + '/extension/multilingual_field/convert/' + id + '/')
 					.done(function (data) {
 						if (data && data.ok) {
 							window.location.reload();
