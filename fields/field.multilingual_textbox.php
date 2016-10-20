@@ -80,21 +80,22 @@
 				$lc = FLang::getLangCode();
 			}
 
-			$handle = Lang::createHandle(strip_tags(html_entity_decode($value)));
+			$max_length = 255;
+			$handle = Lang::createHandle(strip_tags(html_entity_decode($value)), $max_length);
 
 			if ($this->isHandleLocked($handle, $entry_id, $lc)) {
 				if ($this->isHandleFresh($handle, $value, $entry_id, $lc)) {
 					return $this->getCurrentHandle($entry_id, $lc);
-				}
+				} else {
+					$count = 1;
 
-				else {
-					$count = 2;
-
-					while ($this->isHandleLocked("{$handle}-{$count}", $entry_id, $lc)) {
+					do {
 						$count++;
-					}
+						$countString = "-{$count}";
+						$subHandle = trim(General::substr($handle, 0, $max_length - General::strlen($countString)), '-');
+					} while ($this->isHandleLocked("{$subHandle}-{$count}", $entry_id, $lc));
 
-					return "{$handle}-{$count}";
+					return "{$subHandle}-{$count}";
 				}
 			}
 
