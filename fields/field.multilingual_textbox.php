@@ -776,10 +776,10 @@
 					return $data['handle'];
 				}
 				else if (isset($data["value-$lc"])) {
-					return General::createHandle($data["value-$lc"]);
+					return Lang::createHandle($data["value-$lc"]);
 				}
 				else if (isset($data['value'])) {
-					return General::createHandle($data['value']);
+					return Lang::createHandle($data['value']);
 				}
 			}
 
