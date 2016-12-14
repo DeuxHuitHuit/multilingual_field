@@ -4,13 +4,12 @@
 		die('<h2>Symphony Error</h2><p>You cannot directly access this file</p>');
 	}
 
-	require_once(EXTENSIONS . '/textboxfield/extension.driver.php');
-
-	Class Extension_Multilingual_Field extends Extension_TextBoxField {
+	class Extension_Multilingual_Field extends Extension {
 
 		const FIELD_TABLE = 'tbl_fields_multilingual_textbox';
-
-		const SETTINGS_HEADERS = 4;
+		const PUBLISH_HEADERS = 1;
+		const SETTINGS_HEADERS = 2;
+		private static $appendedHeaders = 0;
 
 		/*------------------------------------------------------------------------------------------------*/
 		/*  Installation  */
@@ -229,7 +228,7 @@
 					$page->addScriptToHead(URL . '/extensions/multilingual_field/assets/multilingual_field.settings.js');
 				}
 
-				self::$appendedHeaders &= $type;
+				self::$appendedHeaders |= $type;
 			}
 		}
 

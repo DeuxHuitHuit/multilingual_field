@@ -915,7 +915,4 @@
 
 			$f->appendChild($required);
 		}
-//		public function prepareImportValue($data, $mode, $entry_id = null) {
-//
-//		}
 	}
