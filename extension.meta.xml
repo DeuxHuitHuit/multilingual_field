@@ -28,6 +28,9 @@
 		<dependency version="2.4.0">https://github.com/symphonists/textboxfield</dependency>
 	</dependencies>
 	<releases>
+		<release version="3.5.7" date="2016-12-14" min="2.6.0" max="2.x.x">
+			* Fixed a bug where assets were not loaded
+		</release>
 		<release version="3.5.6" date="2016-10-20" min="2.6.0" max="2.x.x">
 			* Fixed a bug where handles could be bigger than 255 chars
 		</release>
