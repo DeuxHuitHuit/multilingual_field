@@ -20,14 +20,14 @@
 			$this->createFieldTable();
 		}
 
-		public function update($prev_version) {
+		public function update($previousVersion = false) {
 
-			if (version_compare($prev_version, '2.0', '<')) {
+			if (version_compare($previousVersion, '2.0', '<')) {
 				$v1x_table = 'tbl_fields_multilingual';
 
 				$fields = Symphony::Database()->fetch(sprintf("SELECT field_id FROM `%s`", $v1x_table));
 
-				if (version_compare($prev_version, '1.1', '<')) {
+				if (version_compare($previousVersion, '1.1', '<')) {
 					foreach ($fields as $field) {
 						$entries_table = 'tbl_entries_data_' . $field["field_id"];
 
@@ -37,7 +37,7 @@
 					}
 				}
 
-				if (version_compare($prev_version, '1.2', '<')) {
+				if (version_compare($previousVersion, '1.2', '<')) {
 					foreach ($fields as $field) {
 						$entries_table = 'tbl_entries_data_' . $field["field_id"];
 
@@ -54,17 +54,17 @@
 					}
 				}
 
-				if (version_compare($prev_version, '1.4', '<')) {
+				if (version_compare($previousVersion, '1.4', '<')) {
 					Symphony::Database()->query(sprintf("ALTER TABLE `%s` ADD COLUMN `unique_handle` ENUM('yes','no') DEFAULT 'yes'", $v1x_table));
 					Symphony::Database()->query(sprintf("UPDATE `%s` SET `unique_handle` = 'yes'", $v1x_table));
 				}
 
-				if (version_compare($prev_version, '1.4.1', '<')) {
+				if (version_compare($previousVersion, '1.4.1', '<')) {
 					Symphony::Database()->query(sprintf("ALTER TABLE `%s` ADD COLUMN `use_def_lang_vals` ENUM('yes','no') DEFAULT 'yes'", $v1x_table));
 					Symphony::Database()->query(sprintf("UPDATE `%s` SET `use_def_lang_vals` = 'yes'", $v1x_table));
 				}
 
-				if (version_compare($prev_version, '2.0', '<')) {
+				if (version_compare($previousVersion, '2.0', '<')) {
 
 					Symphony::Database()->query(sprintf(
 						"RENAME TABLE `%s` TO `%s`;",
@@ -120,7 +120,7 @@
 				}
 			}
 
-			if (version_compare($prev_version, '3.0', '<')) {
+			if (version_compare($previousVersion, '3.0', '<')) {
 
 				Symphony::Database()->query(sprintf(
 					"ALTER TABLE `%s`
