@@ -396,7 +396,7 @@ class fieldMultilingual_TextBox extends FieldTextBox
             if ($append_dash) {
                 $optional .= ' &ndash; ';
             }
-            
+
             if (empty($required_languages)) {
                 $optional .= __('All languages are optional');
             } else {
@@ -406,7 +406,7 @@ class fieldMultilingual_TextBox extends FieldTextBox
                         $optional_langs[] = $all_langs[$lang];
                     }
                 }
-                
+
                 foreach ($optional_langs as $idx => $lang) {
                     $optional .= ' ' . __($lang);
                     if ($idx < count($optional_langs) - 2) {
@@ -444,7 +444,7 @@ class fieldMultilingual_TextBox extends FieldTextBox
 
         $ul = new XMLElement('ul', null, array('class' => 'tabs'));
         foreach ($langs as $lc) {
-            $li = new XMLElement('li', $all_langs[$lc], array('class' => $lc));
+            $li = new XMLElement('li', $lc, array('class' => $lc));
             $lc === $main_lang ? $ul->prependChild($li) : $ul->appendChild($li);
         }
 
@@ -598,7 +598,7 @@ class fieldMultilingual_TextBox extends FieldTextBox
                 "word_count-$lc"      => General::countWords($data)
             ));
 
-            // Insert values of default language as default values of the field for compatibility with other extensions 
+            // Insert values of default language as default values of the field for compatibility with other extensions
             // that watch the values without lang code.
             if (FLang::getMainLang() == $lc) {
                 $result = array_merge($result, array(
@@ -746,7 +746,7 @@ class fieldMultilingual_TextBox extends FieldTextBox
         $lc = $this->getLang($data);
         return strip_tags($data["value-$lc"]);
     }
-    
+
     protected function getLang($data = null)
     {
         $required_languages = $this->getRequiredLanguages();
@@ -857,7 +857,7 @@ class fieldMultilingual_TextBox extends FieldTextBox
         parent::buildDSRetrievalSQL($data, $joins, $multi_where, $andOperation);
 
         $lc = FLang::getLangCode();
-        
+
         if ($lc) {
             $multi_where = str_replace('.value', ".`value-$lc`", $multi_where);
             $multi_where = str_replace('.handle', ".`handle-$lc`", $multi_where);
@@ -877,7 +877,7 @@ class fieldMultilingual_TextBox extends FieldTextBox
     public function buildSortingSQL(&$joins, &$where, &$sort, $order = 'ASC')
     {
         $lc = FLang::getLangCode();
-        
+
         if (in_array(strtolower($order), array('random', 'rand'))) {
             $sort = 'ORDER BY RAND()';
         }
