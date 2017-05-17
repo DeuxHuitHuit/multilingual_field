@@ -107,7 +107,7 @@ class fieldMultilingual_TextBox extends FieldTextBox
         return $handle;
     }
 
-    public function getCurrentHandle($entry_id, $lc)
+    public function getCurrentHandle($entry_id, $lc = null)
     {
         return Symphony::Database()->fetchVar('handle', 0, sprintf(
             "
@@ -125,7 +125,7 @@ class fieldMultilingual_TextBox extends FieldTextBox
         ));
     }
 
-    public function isHandleLocked($handle, $entry_id, $lc)
+    public function isHandleLocked($handle, $entry_id, $lc = null)
     {
         return (boolean) Symphony::Database()->fetchVar('id', 0, sprintf(
             "
@@ -143,7 +143,7 @@ class fieldMultilingual_TextBox extends FieldTextBox
         ));
     }
 
-    public function isHandleFresh($handle, $value, $entry_id, $lc)
+    public function isHandleFresh($handle, $value, $entry_id, $lc = null)
     {
         return (boolean) Symphony::Database()->fetchVar('id', 0, sprintf(
             "
@@ -350,7 +350,7 @@ class fieldMultilingual_TextBox extends FieldTextBox
     /*  Publish  */
     /*------------------------------------------------------------------------------------------------*/
 
-    public function displayPublishPanel(&$wrapper, $data = null, $error = null, $prefix = null, $postfix = null)
+    public function displayPublishPanel(XMLElement &$wrapper, $data = null, $flagWithError = null, $fieldnamePrefix = null, $fieldnamePostfix = null, $entry_id = null)
     {
         // We've been called out of context: Publish Filter
         $callback = Administration::instance()->getPageCallback();
@@ -459,7 +459,7 @@ class fieldMultilingual_TextBox extends FieldTextBox
             // Input box:
             if ($this->get('text_size') === 'single') {
                 $input = Widget::Input(
-                    "fields{$prefix}[$element_name]{$postfix}[{$lc}]", General::sanitize($data["value-$lc"])
+                    "fields{$fieldnamePrefix}[$element_name]{$fieldnamePostfix}[{$lc}]", General::sanitize($data["value-$lc"])
                 );
 
                 ###
@@ -471,7 +471,7 @@ class fieldMultilingual_TextBox extends FieldTextBox
             // Text Box:
             else {
                 $input = Widget::Textarea(
-                    "fields{$prefix}[$element_name]{$postfix}[{$lc}]", 20, 50, General::sanitize($data["value-$lc"])
+                    "fields{$fieldnamePrefix}[$element_name]{$fieldnamePostfix}[{$lc}]", 20, 50, General::sanitize($data["value-$lc"])
                 );
 
                 ###
@@ -653,7 +653,7 @@ class fieldMultilingual_TextBox extends FieldTextBox
         return $includable_elements;
     }
 
-    public function appendFormattedElement(XMLElement &$wrapper, $data, $encode = false, $mode = null)
+    public function appendFormattedElement(XMLElement &$wrapper, $data, $encode = false, $mode = null, $entry_id = null)
     {
         // all-languages
         $all_languages = strpos($mode, 'all-languages');
@@ -725,7 +725,7 @@ class fieldMultilingual_TextBox extends FieldTextBox
     }
 
     // @todo: remove and fallback to default (Symphony 2.5 only?)
-    public function prepareTableValue($data, XMLElement $link = null)
+    public function prepareTableValue($data, XMLElement $link = null, $entry_id = NULL)
     {
         $lc = $this->getLang($data);
 
@@ -764,7 +764,7 @@ class fieldMultilingual_TextBox extends FieldTextBox
         return $lc;
     }
 
-    public function getParameterPoolValue($data)
+    public function getParameterPoolValue(array $data, $entry_id = NULL)
     {
         $lc = $this->getLang();
         return $data["value-$lc"];
@@ -868,7 +868,7 @@ class fieldMultilingual_TextBox extends FieldTextBox
         Sorting:
     -------------------------------------------------------------------------*/
 
-    public function buildSortingSQL(&$joins, &$where, &$sort, $order = 'ASC')
+    public function buildSortingSQL(&$joins, &$where, &$sort, $order = 'ASC', &$select = NULL)
     {
         $lc = FLang::getLangCode();
         
