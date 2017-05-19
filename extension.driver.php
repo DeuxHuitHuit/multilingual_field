@@ -23,6 +23,8 @@ class Extension_Multilingual_Field extends Extension
 
     public function update($previousVersion = false)
     {
+        $textboxExt = new Extension_TextBoxField();
+
         if (version_compare($previousVersion, '2.0', '<')) {
             $v1x_table = 'tbl_fields_multilingual';
 
@@ -32,7 +34,7 @@ class Extension_Multilingual_Field extends Extension
                 foreach ($fields as $field) {
                     $entries_table = 'tbl_entries_data_' . $field["field_id"];
 
-                    if (!$this->updateHasColumn('value', $entries_table)) {
+                    if (!$textboxExt->updateHasColumn('value', $entries_table)) {
                         Symphony::Database()->query("ALTER TABLE `{$entries_table}` ADD COLUMN `value` TEXT DEFAULT NULL");
                     }
                 }
@@ -43,7 +45,7 @@ class Extension_Multilingual_Field extends Extension
                     $entries_table = 'tbl_entries_data_' . $field["field_id"];
 
                     foreach (FLang::getLangs() as $lc) {
-                        if (!$this->updateHasColumn('handle-' . $lc, $entries_table)) {
+                        if (!$textboxExt->updateHasColumn('handle-' . $lc, $entries_table)) {
                             Symphony::Database()->query("ALTER TABLE `{$entries_table}` ADD COLUMN `handle-{$lc}` TEXT DEFAULT NULL");
 
                             $values = Symphony::Database()->fetch("SELECT `id`, `entry_id`, `value-{$lc}` FROM `{$entries_table}` WHERE `handle` IS NOT NULL");
@@ -104,7 +106,7 @@ class Extension_Multilingual_Field extends Extension
                     ));
 
                     foreach (FLang::getLangs() as $lc) {
-                        if (!$this->updateHasColumn('value_formatted-' . $lc, $entries_table)) {
+                        if (!$textboxExt->updateHasColumn('value_formatted-' . $lc, $entries_table)) {
                             Symphony::Database()->query(sprintf(
                                 'ALTER TABLE `%1$s`
                                     CHANGE COLUMN `value_format-%2$s` `value_formatted-%2$s` TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -122,13 +124,32 @@ class Extension_Multilingual_Field extends Extension
         }
 
         if (version_compare($previousVersion, '3.0', '<')) {
-
             Symphony::Database()->query(sprintf(
                 "ALTER TABLE `%s`
                     CHANGE COLUMN `def_ref_lang` `default_main_lang` ENUM('yes', 'no') CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT 'no',
                     ADD `required_languages` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL;",
                 self::FIELD_TABLE
             ));
+        }
+
+        // is handle unique:
+        if (!$textboxExt->updateHasColumn('handle_unique', self::FIELD_TABLE)) {
+            $textboxExt->updateAddColumn('handle_unique', "ENUM('yes', 'no') NOT NULL DEFAULT 'yes' AFTER `text_handle`", self::FIELD_TABLE);
+        }
+
+        // add field_id unique key
+        if ($textboxExt->updateHasColumn('field_id', self::FIELD_TABLE) && !$textboxExt->updateHasUniqueKey('field_id', self::FIELD_TABLE)) {
+            $textboxExt->updateAddUniqueKey('field_id', self::FIELD_TABLE);
+        }
+
+        // add entry_id unique key
+        $textbox_fields = FieldManager::fetch(null, null, 'ASC', 'sortorder', 'multilingual_textbox');
+        foreach($textbox_fields as $field) {
+            $table = "tbl_entries_data_" . $field->get('id');
+            // Make sure we have a unique key on `entry_id`
+            if ($textboxExt->updateHasColumn('entry_id', $table) && !$textboxExt->updateHasUniqueKey('entry_id', $table)) {
+                $textboxExt->updateAddUniqueKey('entry_id', $table);
+            }
         }
 
         return true;
@@ -155,7 +176,7 @@ class Extension_Multilingual_Field extends Extension
                 `default_main_lang` ENUM('yes', 'no') DEFAULT 'no',
                 `required_languages` VARCHAR(255) DEFAULT NULL,
                 PRIMARY KEY (`id`),
-                KEY `field_id` (`field_id`)
+                UNIQUE KEY `field_id` (`field_id`)
             ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;",
             self::FIELD_TABLE
         ));
