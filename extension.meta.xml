@@ -24,10 +24,13 @@
 		</author>
 	</authors>
 	<dependencies>
-		<dependency version="2.5">http://github.com/DeuxHuitHuit/frontend_localisation</dependency>
-		<dependency version="2.4.0">https://github.com/symphonists/textboxfield</dependency>
+		<dependency version="2.5">frontend_localisation</dependency>
+		<dependency version="2.7.0">textboxfield</dependency>
 	</dependencies>
 	<releases>
+		<release version="3.5.9" date="2017-03-24" min="2.6.0" max="2.x.x">
+			* Add some unique keys
+		</release>
 		<release version="3.5.8" date="2017-03-24" min="2.6.0" max="2.x.x">
 			* Add PHP 7 support
 			* Code formatting to PSR-2
