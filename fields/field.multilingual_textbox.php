@@ -511,8 +511,8 @@ class fieldMultilingual_TextBox extends FieldTextBox
         /*  Errors  */
         /*------------------------------------------------------------------------------------------------*/
 
-        if ($error != null) {
-            $wrapper->appendChild(Widget::Error($container, $error));
+        if ($flagWithError != null) {
+            $wrapper->appendChild(Widget::Error($container, $flagWithError));
         }
         else {
             $wrapper->appendChild($container);
