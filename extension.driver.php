@@ -173,6 +173,7 @@ class Extension_Multilingual_Field extends Extension
                 `text_length` INT(11) UNSIGNED DEFAULT 0,
                 `text_cdata` ENUM('yes', 'no') DEFAULT 'no',
                 `text_handle` ENUM('yes', 'no') DEFAULT 'no',
+                `handle_unique` ENUM('yes', 'no') NOT NULL DEFAULT 'yes',
                 `default_main_lang` ENUM('yes', 'no') DEFAULT 'no',
                 `required_languages` VARCHAR(255) DEFAULT NULL,
                 PRIMARY KEY (`id`),
