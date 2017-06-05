@@ -274,6 +274,11 @@ class Extension_Multilingual_Field extends Extension
                 'callback' => 'dAddCustomPreferenceFieldsets'
             ),
             array(
+                'page'     => '/system/preferences/',
+                'delegate' => 'Save',
+                'callback' => 'dSave'
+            ),
+            array(
                 'page'     => '/extensions/frontend_localisation/',
                 'delegate' => 'FLSavePreferences',
                 'callback' => 'dFLSavePreferences'
@@ -304,6 +309,16 @@ class Extension_Multilingual_Field extends Extension
         $group->appendChild(new XMLElement('p', __('Check this field if you want to consolidate database by <b>keeping</b> entry values of removed/old Language Driver language codes. Entry values of current language codes will not be affected.'), array('class' => 'help')));
 
         $context['wrapper']->appendChild($group);
+    }
+
+    /**
+     * Edits the preferences to be saved
+     *
+     * @param array $context
+     */
+    public function dSave($context) {
+        // prevent the saving of the values
+        unset($context['settings']['multilingual_field']);
     }
 
     /**
@@ -361,7 +376,6 @@ class Extension_Multilingual_Field extends Extension
                 // Add new fields
                 foreach ($new_languages as $lc) {
                     // if columns for language don't exist, create them
-
                     if (!in_array("handle-$lc", $valid_columns)) {
                         Symphony::Database()->query(
                             "ALTER TABLE `$entries_table`
