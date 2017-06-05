@@ -28,6 +28,9 @@
 		<dependency version="2.7.0">textboxfield</dependency>
 	</dependencies>
 	<releases>
+		<release version="3.5.11" date="2017-06-05" min="2.6.0" max="2.x.x">
+			* Make sure consolidate value does not end up in config.php
+		</release>
 		<release version="3.5.10" date="2017-06-01" min="2.6.0" max="2.x.x">
 			* Add missing `handle_unique` column on install
 		</release>
