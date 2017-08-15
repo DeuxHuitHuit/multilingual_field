@@ -85,7 +85,7 @@ class fieldMultilingual_TextBox extends FieldTextBox
             $lc = FLang::getLangCode();
         }
 
-        $max_length = 255;
+        $max_length = 1023;
         $handle = Lang::createHandle(strip_tags(html_entity_decode($value)), $max_length);
 
         if ($this->get('handle_unique') === 'yes' && $this->isHandleLocked($handle, $entry_id, $lc)) {
