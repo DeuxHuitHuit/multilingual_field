@@ -25,8 +25,8 @@ class fieldMultilingual_TextBox extends FieldTextBox
         $cols = array();
         foreach (FLang::getLangs() as $lc) {
             $cols[] = "`handle-{$lc}` VARCHAR(255) DEFAULT NULL,";
-            $cols[] = "`value-{$lc}` TEXT default NULL,";
-            $cols[] = "`value_formatted-{$lc}` TEXT default NULL,";
+            $cols[] = "`value-{$lc}` TEXT DEFAULT NULL,";
+            $cols[] = "`value_formatted-{$lc}` TEXT DEFAULT NULL,";
             $cols[] = "`word_count-{$lc}` INT(11) UNSIGNED DEFAULT NULL,";
         }
         return $cols;
@@ -725,7 +725,7 @@ class fieldMultilingual_TextBox extends FieldTextBox
     }
 
     // @todo: remove and fallback to default (Symphony 2.5 only?)
-    public function prepareTableValue($data, XMLElement $link = null, $entry_id = NULL)
+    public function prepareTableValue($data, XMLElement $link = null, $entry_id = null)
     {
         $lc = $this->getLang($data);
 
@@ -764,7 +764,7 @@ class fieldMultilingual_TextBox extends FieldTextBox
         return $lc;
     }
 
-    public function getParameterPoolValue(array $data, $entry_id = NULL)
+    public function getParameterPoolValue(array $data, $entry_id = null)
     {
         $lc = $this->getLang();
         return $data["value-$lc"];

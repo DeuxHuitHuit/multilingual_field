@@ -399,10 +399,10 @@ class Extension_Multilingual_Field extends Extension
                     if (!in_array("handle-$lc", $valid_columns)) {
                         Symphony::Database()->query(
                             "ALTER TABLE `$entries_table`
-                                ADD COLUMN `handle-$lc` varchar(255) default NULL,
-                                ADD COLUMN `value-$lc` text default NULL,
-                                ADD COLUMN `value_formatted-$lc` text default NULL,
-                                ADD COLUMN `word_count-$lc` int(11) default NULL;"
+                                ADD COLUMN `handle-$lc` VARCHAR(255) DEFAULT NULL,
+                                ADD COLUMN `value-$lc` TEXT DEFAULT NULL,
+                                ADD COLUMN `value_formatted-$lc` TEXT DEFAULT NULL,
+                                ADD COLUMN `word_count-$lc` INT(11) DEFAULT NULL;"
                         );
                     }
                 }
