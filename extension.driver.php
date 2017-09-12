@@ -146,12 +146,26 @@ class Extension_Multilingual_Field extends Extension
         $textbox_fields = FieldManager::fetch(null, null, 'ASC', 'sortorder', 'multilingual_textbox');
         foreach($textbox_fields as $field) {
             $table = "tbl_entries_data_" . $field->get('id');
+            try {
+                // We need to drop the key, because we will alter
+                // it when altering the column.
+                Symphony::Database()->query("
+                    ALTER TABLE
+                        `$table`
+                    DROP KEY
+                        `handle`
+                ");
+            } catch (Exception $ex) {
+                // ignore
+            }
+            // Handle length
+            $textboxExt->updateModifyColumn('handle', 'VARCHAR(1024)', $table);
+
             // Make sure we have an index on the handle
             if ($textboxExt->updateHasColumn('text_handle', $table) && !$textboxExt->updateHasIndex('handle', $table)) {
                 $textboxExt->updateAddIndex('handle', $table, 333);
             }
-            // Handle length
-            $textboxExt->updateModifyColumn('handle', 'VARCHAR(1024)', $table);
+
             // Make sure we have a unique key on `entry_id`
             if ($textboxExt->updateHasColumn('entry_id', $table) && !$textboxExt->updateHasUniqueKey('entry_id', $table)) {
                 $textboxExt->updateAddUniqueKey('entry_id', $table);
