@@ -28,6 +28,9 @@
 		<dependency version="2.7.0">textboxfield</dependency>
 	</dependencies>
 	<releases>
+		<release version="3.5.13" date="2017-09-12" min="2.6.0" max="2.x.x">
+			* To make sure we can alter the handle column without error, drop its key first
+		</release>
 		<release version="3.5.12" date="2017-08-15" min="2.6.0" max="2.x.x">
 			* Make sure we check if unique handle option is enabled or not
 			* Allow handle to be 1023 chars long, instead of 255
