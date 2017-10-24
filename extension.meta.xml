@@ -28,6 +28,11 @@
 		<dependency version="2.7.0">textboxfield</dependency>
 	</dependencies>
 	<releases>
+		<release version="3.5.14" date="2017-10-24" min="2.6.0" max="2.x.x">
+			* Fixes for PHP 7 support
+			* Fix casing in SQL and PHP keywords
+			* Fix errors in error handling
+		</release>
 		<release version="3.5.13" date="2017-09-12" min="2.6.0" max="2.x.x">
 			* To make sure we can alter the handle column without error, drop its key first
 		</release>
