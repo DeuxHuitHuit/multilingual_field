@@ -160,6 +160,11 @@ class Extension_Multilingual_Field extends Extension
             }
             // Handle length
             $textboxExt->updateModifyColumn('handle', 'VARCHAR(1024)', $table);
+            foreach (FLang::getLangs() as $lc) {
+                if ($textboxExt->updateHasColumn("handle-$lc", $table) {
+                    $textboxExt->updateModifyColumn("handle-$lc", 'VARCHAR(1024)', $table);
+                }
+            }
 
             // Make sure we have an index on the handle
             if ($textboxExt->updateHasColumn('text_handle', $table) && !$textboxExt->updateHasIndex('handle', $table)) {
