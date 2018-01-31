@@ -3,7 +3,7 @@
 	<name>Field: Multilingual Text Box</name>
 	<description>The multilingual version of Textbox field.</description>
 	<repo type="github">https://github.com/vlad-ghita/multilingual_field</repo>
-	<url type="discuss">http://www.getsymphony.com/discuss/thread/46067/</url>
+	<url type="discuss">https://www.getsymphony.com/discuss/thread/46067/</url>
 	<types>
 		<type>Field</type>
 		<type>Field Types</type>
@@ -28,6 +28,9 @@
 		<dependency version="2.7.0">textboxfield</dependency>
 	</dependencies>
 	<releases>
+		<release version="3.5.15" date="2018-01-31" min="2.6.0" max="2.x.x">
+			* Make sure localized handles are updated too
+		</release>
 		<release version="3.5.14" date="2017-10-24" min="2.6.0" max="2.x.x">
 			* Fixes for PHP 7 support
 			* Fix casing in SQL and PHP keywords
