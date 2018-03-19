@@ -162,6 +162,18 @@ class Extension_Multilingual_Field extends Extension
             $textboxExt->updateModifyColumn('handle', 'VARCHAR(1024)', $table);
             foreach (FLang::getLangs() as $lc) {
                 if ($textboxExt->updateHasColumn("handle-$lc", $table)) {
+                    try {
+                        // We need to drop the key, because we will alter
+                        // it when altering the column.
+                        Symphony::Database()->query("
+                            ALTER TABLE
+                                `$table`
+                            DROP KEY
+                                `handle-$lc`
+                        ");
+                    } catch (Exception $ex) {
+                        // ignore
+                    }
                     $textboxExt->updateModifyColumn("handle-$lc", 'VARCHAR(1024)', $table);
                 }
             }
