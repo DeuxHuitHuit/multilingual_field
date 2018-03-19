@@ -28,6 +28,10 @@
 		<dependency version="2.7.0">textboxfield</dependency>
 	</dependencies>
 	<releases>
+		<release version="3.5.17" date="2018-02-09" min="2.6.0" max="2.x.x">
+			* Drop index before changing column
+			* Check the right table for the `text_handle` column
+		</release>
 		<release version="3.5.16" date="2018-02-09" min="2.6.0" max="2.x.x">
 			* Hotfix: Add missing ) from 3.5.15
 		</release>
