@@ -179,7 +179,7 @@ class Extension_Multilingual_Field extends Extension
             }
 
             // Make sure we have an index on the handle
-            if ($textboxExt->updateHasColumn('text_handle', $table) && !$textboxExt->updateHasIndex('handle', $table)) {
+            if ($textboxExt->updateHasColumn('text_handle') && !$textboxExt->updateHasIndex('handle', $table)) {
                 $textboxExt->updateAddIndex('handle', $table, 333);
             }
 
