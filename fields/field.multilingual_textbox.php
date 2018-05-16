@@ -24,10 +24,26 @@ class fieldMultilingual_TextBox extends FieldTextBox
     {
         $cols = array();
         foreach (FLang::getLangs() as $lc) {
-            $cols[] = "`handle-{$lc}` VARCHAR(1024) DEFAULT NULL,";
-            $cols[] = "`value-{$lc}` TEXT DEFAULT NULL,";
-            $cols[] = "`value_formatted-{$lc}` TEXT DEFAULT NULL,";
-            $cols[] = "`word_count-{$lc}` INT(11) UNSIGNED DEFAULT NULL,";
+            // $cols[] = "`handle-{$lc}` VARCHAR(255) DEFAULT NULL,";
+            // $cols[] = "`value-{$lc}` TEXT DEFAULT NULL,";
+            // $cols[] = "`value_formatted-{$lc}` TEXT DEFAULT NULL,";
+            // $cols[] = "`word_count-{$lc}` INT(11) UNSIGNED DEFAULT NULL,";
+            $cols["handle-$lc"] = [
+                'type' => 'varchar(1024)',
+                'default' => null,
+            ];
+            $cols["value-$lc"] = [
+                'type' => 'text',
+                'default' => null,
+            ];
+            $cols["value_formatted-$lc"] = [
+                'type' => 'text',
+                'default' => null,
+            ];
+            $cols["word_count-$lc"] = [
+                'type' => 'int(11)',
+                'default' => null,
+            ];
         }
         return $cols;
     }
@@ -36,9 +52,12 @@ class fieldMultilingual_TextBox extends FieldTextBox
     {
         $keys = array();
         foreach (FLang::getLangs() as $lc) {
-            $keys[] = "KEY `handle-{$lc}` (`handle-{$lc}`),";
-            $keys[] = "FULLTEXT KEY `value-{$lc}` (`value-{$lc}`),";
-            $keys[] = "FULLTEXT KEY `value_formatted-{$lc}` (`value_formatted-{$lc}`),";
+            // $keys[] = "KEY `handle-{$lc}` (`handle-{$lc}`),";
+            // $keys[] = "FULLTEXT KEY `value-{$lc}` (`value-{$lc}`),";
+            // $keys[] = "FULLTEXT KEY `value_formatted-{$lc}` (`value_formatted-{$lc}`),";
+            $keys["handle-$lc"] = 'key';
+            $keys["value-$lc"] = 'fulltext';
+            $keys["value_formatted-$lc"] = 'fulltext';
         }
         return $keys;
     }
@@ -47,30 +66,67 @@ class fieldMultilingual_TextBox extends FieldTextBox
     {
         $field_id = $this->get('id');
 
-        $query = "
-            CREATE TABLE IF NOT EXISTS `tbl_entries_data_{$field_id}` (
-                `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-                `entry_id` INT(11) UNSIGNED NOT NULL,
-                `handle` VARCHAR(1024) DEFAULT NULL,
-                `value` TEXT DEFAULT NULL,
-                `value_formatted` TEXT DEFAULT NULL,
-                `word_count` INT(11) UNSIGNED DEFAULT NULL,";
+        // $query = "
+        //     CREATE TABLE IF NOT EXISTS `tbl_entries_data_{$field_id}` (
+        //         `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+        //         `entry_id` INT(11) UNSIGNED NOT NULL,
+        //         `handle` VARCHAR(255) DEFAULT NULL,
+        //         `value` TEXT DEFAULT NULL,
+        //         `value_formatted` TEXT DEFAULT NULL,
+        //         `word_count` INT(11) UNSIGNED DEFAULT NULL,";
 
-        $query .= implode('', self::generateTableColumns());
+        // $query .= implode('', self::generateTableColumns());
 
-        $query .= "
-                PRIMARY KEY (`id`),
-                UNIQUE KEY `entry_id` (`entry_id`),";
+        // $query .= "
+        //         PRIMARY KEY (`id`),
+        //         UNIQUE KEY `entry_id` (`entry_id`),";
 
-        $query .= implode('', self::generateTableKeys());
+        // $query .= implode('', self::generateTableKeys());
 
-        $query .= "
-                KEY `handle` (`handle`),
-                FULLTEXT KEY `value` (`value`),
-                FULLTEXT KEY `value_formatted` (`value_formatted`)
-            ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
+        // $query .= "
+        //         KEY `handle` (`handle`),
+        //         FULLTEXT KEY `value` (`value`),
+        //         FULLTEXT KEY `value_formatted` (`value_formatted`)
+        //     ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
 
-        return Symphony::Database()->query($query);
+        // return Symphony::Database()->query($query);
+        return $query = Symphony::Database()
+            ->create("tbl_entries_data_$field_id")
+            ->ifNotExists()
+            ->fields([
+                'id' => [
+                    'type' => 'int(11)',
+                    'auto' => true,
+                ],
+                'entry_id' => 'int(11)',
+                'handle' => [
+                    'type' => 'varchar(1024)',
+                    'default' => null,
+                ],
+                'value' => [
+                    'type' => 'text',
+                    'default' => null,
+                ],
+                'value_formatted' => [
+                    'type' => 'text',
+                    'default' => null,
+                ],
+                'word_count' => [
+                    'type' => 'int(11)',
+                    'default' => null,
+                ],
+                self::generateTableColumns(),
+            ])
+            ->keys([
+                'id' => 'primary',
+                'entry_id' => 'unique',
+                self::generateTableKeys(),
+                'handle' => 'key',
+                'value' => 'fulltext',
+                'value_formatted' => 'fulltext',
+            ])
+            ->execute()
+            ->success();
     }
 
 
@@ -109,58 +165,86 @@ class fieldMultilingual_TextBox extends FieldTextBox
 
     public function getCurrentHandle($entry_id, $lc = null)
     {
-        return Symphony::Database()->fetchVar('handle', 0, sprintf(
-            "
-                SELECT
-                    f.`handle-%s`
-                FROM
-                    `tbl_entries_data_%s` AS f
-                WHERE
-                    f.entry_id = '%s'
-                LIMIT 1
-            ",
-            $lc,
-            $this->get('id'),
-            $entry_id
-        ));
+        // return Symphony::Database()->fetchVar('handle', 0, sprintf(
+        //     "
+        //         SELECT
+        //             f.`handle-%s`
+        //         FROM
+        //             `tbl_entries_data_%s` AS f
+        //         WHERE
+        //             f.entry_id = '%s'
+        //         LIMIT 1
+        //     ",
+        //     $lc,
+        //     $this->get('id'),
+        //     $entry_id
+        // ));
+        return Symphony::Database()
+            ->select(["f.handle-$lc"])
+            ->from('tbl_entries_data_' . $this->get('id'), 'f')
+            ->where(['f.entry_id' => $entry_id])
+            ->limit(1)
+            ->execute()
+            ->variable('handle');
     }
 
     public function isHandleLocked($handle, $entry_id, $lc = null)
     {
-        return (boolean) Symphony::Database()->fetchVar('id', 0, sprintf(
-            "
-                SELECT
-                    f.id
-                FROM
-                    `tbl_entries_data_%s` AS f
-                WHERE
-                    f.`handle-%s` = '%s'
-                    %s
-                LIMIT 1
-            ",
-            $this->get('id'), $lc, $handle,
-            (!is_null($entry_id) ? "AND f.entry_id != '{$entry_id}'" : '')
-        ));
+        // return (boolean) Symphony::Database()->fetchVar('id', 0, sprintf(
+        //     "
+        //         SELECT
+        //             f.id
+        //         FROM
+        //             `tbl_entries_data_%s` AS f
+        //         WHERE
+        //             f.`handle-%s` = '%s'
+        //             %s
+        //         LIMIT 1
+        //     ",
+        //     $this->get('id'), $lc, $handle,
+        //     (!is_null($entry_id) ? "AND f.entry_id != '{$entry_id}'" : '')
+        // ));
+        $q = Symphony::Dabatase()
+            ->select(['f.id'])
+            ->from('tbl_entries_data_' . $this->get('id'), 'f')
+            ->where(["f.handle-$lc" => $handle]);
+
+        if (!is_null($entry_id)) {
+            $q->where(['f.entry_id' => $entry_id]);
+        }
+
+        return (boolean) $q->limit(1)->execute()->variable('id');
     }
 
     public function isHandleFresh($handle, $value, $entry_id, $lc = null)
     {
-        return (boolean) Symphony::Database()->fetchVar('id', 0, sprintf(
-            "
-                SELECT
-                    f.id
-                FROM
-                    `tbl_entries_data_%s` AS f
-                WHERE
-                    f.entry_id = '%s'
-                    AND f.`value-%s` = '%s'
-                    AND f.`handle-%s` = '%s'
-                LIMIT 1
-            ",
-            $this->get('id'), $entry_id,
-            $lc, $this->cleanValue(General::sanitize($value)),
-            $lc, $this->cleanValue(General::sanitize($handle))
-        ));
+        // return (boolean) Symphony::Database()->fetchVar('id', 0, sprintf(
+        //     "
+        //         SELECT
+        //             f.id
+        //         FROM
+        //             `tbl_entries_data_%s` AS f
+        //         WHERE
+        //             f.entry_id = '%s'
+        //             AND f.`value-%s` = '%s'
+        //             AND f.`handle-%s` = '%s'
+        //         LIMIT 1
+        //     ",
+        //     $this->get('id'), $entry_id,
+        //     $lc, $this->cleanValue(General::sanitize($value)),
+        //     $lc, $this->cleanValue(General::sanitize($handle))
+        // ));
+        return (boolean) Symphony::Database()
+            ->select(['f.id'])
+            ->from('tbl_entries_data_' . $this->get('id'), 'f')
+            ->where([
+                'f.entry_id' => $entry_id,
+                "f.value-$lc" => $this->cleanValue(General::sanitize($value)),
+                "f.handle-$lc" => $this->cleanValue(General::sanitize($handle)),
+            ])
+            ->limit()
+            ->execute()
+            ->variable('id');
     }
 
     /**
@@ -335,19 +419,28 @@ class fieldMultilingual_TextBox extends FieldTextBox
             return false;
         }
 
-        return Symphony::Database()->query(sprintf("
-            UPDATE
-                `tbl_fields_%s`
-            SET
-                `default_main_lang` = '%s',
-                `required_languages` = '%s'
-            WHERE
-                `field_id` = '%s';",
-            $this->handle(),
-            $this->get('default_main_lang') === 'yes' ? 'yes' : 'no',
-            implode(',', $this->get('required_languages')),
-            $this->get('id')
-        ));
+        // return Symphony::Database()->query(sprintf("
+        //     UPDATE
+        //         `tbl_fields_%s`
+        //     SET
+        //         `default_main_lang` = '%s',
+        //         `required_languages` = '%s'
+        //     WHERE
+        //         `field_id` = '%s';",
+        //     $this->handle(),
+        //     $this->get('default_main_lang') === 'yes' ? 'yes' : 'no',
+        //     implode(',', $this->get('required_languages')),
+        //     $this->get('id')
+        // ));
+        return Symphony::Database()
+            ->alter('tbl_fields_' . $this->handle())
+            ->set([
+                'default_main_lang' => $this->get('default_main_lang') === 'yes' ? 'yes' : 'no',
+                'required_languages' => implode(',', $this->get('required_languages')),
+            ])
+            ->where(['field_id' => $this->get('id')])
+            ->execute()
+            ->success();
     }
 
 
@@ -637,8 +730,6 @@ class fieldMultilingual_TextBox extends FieldTextBox
 
         return Symphony::Database()->fetchRow(0, $query);
     }
-
-
 
     /*------------------------------------------------------------------------------------------------*/
     /*  Output  */
