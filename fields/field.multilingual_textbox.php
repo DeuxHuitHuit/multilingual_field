@@ -93,7 +93,7 @@ class fieldMultilingual_TextBox extends FieldTextBox
         return $query = Symphony::Database()
             ->create("tbl_entries_data_$field_id")
             ->ifNotExists()
-            ->fields([
+            ->fields(array_merge([
                 'id' => [
                     'type' => 'int(11)',
                     'auto' => true,
@@ -115,16 +115,14 @@ class fieldMultilingual_TextBox extends FieldTextBox
                     'type' => 'int(11)',
                     'default' => null,
                 ],
-                self::generateTableColumns(),
-            ])
-            ->keys([
+            ], self::generateTableColumns()))
+            ->keys(array_merge([
                 'id' => 'primary',
                 'entry_id' => 'unique',
-                self::generateTableKeys(),
                 'handle' => 'key',
                 'value' => 'fulltext',
                 'value_formatted' => 'fulltext',
-            ])
+            ], self::generateTableKeys()))
             ->execute()
             ->success();
     }
