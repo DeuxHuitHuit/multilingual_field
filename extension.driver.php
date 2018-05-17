@@ -17,7 +17,6 @@ class Extension_Multilingual_Field extends Extension
 
     public function install()
     {
-        $this->dropFieldTable();
         $this->createFieldTable();
     }
 
@@ -46,7 +45,7 @@ class Extension_Multilingual_Field extends Extension
                             ->add([
                                 'value' => [
                                     'type' => 'text',
-                                    'default' => null,
+                                    'null' => true,
                                 ],
                             ])
                             ->execute()
@@ -67,7 +66,7 @@ class Extension_Multilingual_Field extends Extension
                                 ->add([
                                     "handle-$lc" => [
                                         'type' => 'text',
-                                        'default' => null,
+                                        'null' => true,
                                     ],
                                 ])
                                 ->execute()
@@ -182,7 +181,7 @@ class Extension_Multilingual_Field extends Extension
                             'type' => 'varchar(255)',
                             'charset' => 'utf8',
                             'collate' => 'utf8_unicode_ci',
-                            'default' => null,
+                            'null' => true,
                         ],
                         'text_handle' => [
                             'type' => 'enum',
@@ -204,7 +203,7 @@ class Extension_Multilingual_Field extends Extension
                             'type' => 'varchar(255)',
                             'charset' => 'utf8',
                             'collate' => 'utf8_unicode_ci',
-                            'default' => null,
+                            'null' => true,
                         ],
                         'text_size' => [
                             'type' => 'enum',
@@ -253,13 +252,13 @@ class Extension_Multilingual_Field extends Extension
                                 'type' => 'varchar(255)',
                                 'charset' => 'utf8',
                                 'collate' => 'utf8_unicode_ci',
-                                'default' => null,
+                                'null' => true,
                             ],
                             'value' => [
                                 'type' => 'text',
                                 'charset' => 'utf8',
                                 'collate' => 'utf8_unicode_ci',
-                                'default' => null,
+                                'null' => true,
                             ],
                         ])
                         ->execute()
@@ -284,7 +283,7 @@ class Extension_Multilingual_Field extends Extension
                                         'type' => 'text',
                                         'charset' => 'utf8',
                                         'collate' => 'utf8_unicode_ci',
-                                        'default' => null,
+                                        'null' => true,
                                     ],
                                 ])
                                 ->modify([
@@ -292,17 +291,17 @@ class Extension_Multilingual_Field extends Extension
                                         'type' => 'varchar(255)',
                                         'charset' => 'utf8',
                                         'collate' => 'utf8_unicode_ci',
-                                        'default' => null,
+                                        'null' => true,
                                     ],
                                     "value-$lc" => [
                                         'type' => 'text',
                                         'charset' => 'utf8',
                                         'collate' => 'utf8_unicode_ci',
-                                        'default' => null,
+                                        'null' => true,
                                     ],
                                     "word_count-$lc" => [
                                         'type' => 'int(11)',
-                                        'default' => null,
+                                        'null' => true,
                                     ],
                                 ])
                                 ->addKey([
@@ -340,7 +339,7 @@ class Extension_Multilingual_Field extends Extension
                         'type' => 'varchar(255)',
                         'charset' => 'utf8',
                         'collate' => 'utf8_unicode_ci',
-                        'default' => null,
+                        'null' => true,
                     ],
                 ])
                 ->execute()
@@ -441,6 +440,8 @@ class Extension_Multilingual_Field extends Extension
         return Symphony::Database()
             ->create(self::FIELD_TABLE)
             ->ifNotExists()
+            ->charset('utf8')
+            ->collate('utf8_unicode_ci')
             ->fields([
                 'id' => [
                     'type' => 'int(11)',
@@ -458,11 +459,11 @@ class Extension_Multilingual_Field extends Extension
                 ],
                 'text_formatter' => [
                     'type' => 'varchar(255)',
-                    'default' => null,
+                    'null' => true,
                 ],
                 'text_validator' => [
                     'type' => 'varchar(255)',
-                    'default' => null,
+                    'null' => true,
                 ],
                 'text_length' => [
                     'type' => 'int(11)',
@@ -490,7 +491,7 @@ class Extension_Multilingual_Field extends Extension
                 ],
                 'required_languages' => [
                     'type' => 'varchar(255)',
-                    'default' => null,
+                    'null' => true,
                 ],
             ])
             ->keys([
@@ -547,7 +548,7 @@ class Extension_Multilingual_Field extends Extension
         //     $handle,
         //     (!is_null($entry_id) ? "AND f.entry_id != '{$entry_id}'" : '')
         // ));
-        $q = Symphony::database()
+        $q = Symphony::Database()
             ->select(['f.id'])
             ->from($tbl, 'f')
             ->where(["f.handle-$lang" => $handle]);
@@ -739,19 +740,19 @@ class Extension_Multilingual_Field extends Extension
                             ->add([
                                 "handle-$lc" => [
                                     'type' => 'varchar(255)',
-                                    'default' => null,
+                                    'null' => true,
                                 ],
                                 "value-$lc" => [
                                     'type' => 'text',
-                                    'default' => null,
+                                    'null' => true,
                                 ],
                                 "value_formatted-$lc" => [
                                     'type' => 'text',
-                                    'default' => null,
+                                    'null' => true,
                                 ],
                                 "word_count-$lc" => [
                                     'type' => 'int(11)',
-                                    'default' => null,
+                                    'null' => true,
                                 ],
                             ])
                             ->execute()

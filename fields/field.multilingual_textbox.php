@@ -30,19 +30,19 @@ class fieldMultilingual_TextBox extends FieldTextBox
             // $cols[] = "`word_count-{$lc}` INT(11) UNSIGNED DEFAULT NULL,";
             $cols["handle-$lc"] = [
                 'type' => 'varchar(1024)',
-                'default' => null,
+                'null' => true,
             ];
             $cols["value-$lc"] = [
                 'type' => 'text',
-                'default' => null,
+                'null' => true,
             ];
             $cols["value_formatted-$lc"] = [
                 'type' => 'text',
-                'default' => null,
+                'null' => true,
             ];
             $cols["word_count-$lc"] = [
                 'type' => 'int(11)',
-                'default' => null,
+                'null' => true,
             ];
         }
         return $cols;
@@ -93,6 +93,8 @@ class fieldMultilingual_TextBox extends FieldTextBox
         return $query = Symphony::Database()
             ->create("tbl_entries_data_$field_id")
             ->ifNotExists()
+            ->charset('utf8')
+            ->collate('utf8_unicode_ci')
             ->fields(array_merge([
                 'id' => [
                     'type' => 'int(11)',
@@ -101,19 +103,19 @@ class fieldMultilingual_TextBox extends FieldTextBox
                 'entry_id' => 'int(11)',
                 'handle' => [
                     'type' => 'varchar(1024)',
-                    'default' => null,
+                    'null' => true,
                 ],
                 'value' => [
                     'type' => 'text',
-                    'default' => null,
+                    'null' => true,
                 ],
                 'value_formatted' => [
                     'type' => 'text',
-                    'default' => null,
+                    'null' => true,
                 ],
                 'word_count' => [
                     'type' => 'int(11)',
-                    'default' => null,
+                    'null' => true,
                 ],
             ], self::generateTableColumns()))
             ->keys(array_merge([
@@ -202,7 +204,7 @@ class fieldMultilingual_TextBox extends FieldTextBox
         //     $this->get('id'), $lc, $handle,
         //     (!is_null($entry_id) ? "AND f.entry_id != '{$entry_id}'" : '')
         // ));
-        $q = Symphony::Dabatase()
+        $q = Symphony::Database()
             ->select(['f.id'])
             ->from('tbl_entries_data_' . $this->get('id'), 'f')
             ->where(["f.handle-$lc" => $handle]);
@@ -235,12 +237,10 @@ class fieldMultilingual_TextBox extends FieldTextBox
         return (boolean) Symphony::Database()
             ->select(['f.id'])
             ->from('tbl_entries_data_' . $this->get('id'), 'f')
-            ->where([
-                'f.entry_id' => $entry_id,
-                "f.value-$lc" => $this->cleanValue(General::sanitize($value)),
-                "f.handle-$lc" => $this->cleanValue(General::sanitize($handle)),
-            ])
-            ->limit()
+            ->where(['f.entry_id' => $entry_id])
+            ->where(["f.value-$lc" => $this->cleanValue(General::sanitize($value))])
+            ->where(["f.handle-$lc" => $this->cleanValue(General::sanitize($handle))])
+            ->limit(1)
             ->execute()
             ->variable('id');
     }
@@ -431,7 +431,7 @@ class fieldMultilingual_TextBox extends FieldTextBox
         //     $this->get('id')
         // ));
         return Symphony::Database()
-            ->alter('tbl_fields_' . $this->handle())
+            ->update('tbl_fields_' . $this->handle())
             ->set([
                 'default_main_lang' => $this->get('default_main_lang') === 'yes' ? 'yes' : 'no',
                 'required_languages' => implode(',', $this->get('required_languages')),
