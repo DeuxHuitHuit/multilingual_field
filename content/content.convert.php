@@ -56,18 +56,6 @@ class contentExtensionMultilingual_FieldConvert extends JSONPage
             $text_handle = MySQL::cleanValue($field->get('text_handle'));
 
             // ALTER data table SQL: add new cols
-            // $entries_table = "tbl_entries_data_$id";
-            // $query = "ALTER TABLE `$entries_table` ";
-            // $cols = fieldMultilingual_TextBox::generateTableColumns();
-            // foreach ($cols as $col) {
-            //     $query .= ' ADD COLUMN ' . $col;
-            // }
-            // $keys = fieldMultilingual_TextBox::generateTableKeys();
-            // foreach ($keys as $key) {
-            //     $query .= ' ADD ' . $key;
-            // }
-            // $query = trim($query, ',');
-            // Symphony::Database()->query($query);
             $entries_table = "tbl_entries_data_$id";
             $cols = fieldMultilingual_TextBox::generateTableColumns();
             $keys = fieldMultilingual_TextBox::generateTableKeys();
@@ -78,16 +66,7 @@ class contentExtensionMultilingual_FieldConvert extends JSONPage
                 ->execute()
                 ->success();
 
-            // // Copy values
-            // $query = "UPDATE `$entries_table` SET ";
-            // foreach ($langs as $lc) {
-            //     $query .= " `handle-$lc` = `handle`,
-            //          `value-$lc` = `value`,
-            //          `value_formatted-$lc` = `value_formatted`,
-            //          `word_count-$lc` = `word_count`,";
-            // }
-            // $query = trim($query, ',');
-            // Symphony::Database()->query($query);
+            // Copy values
             $values = array();
             foreach ($langs as $lc) {
                 $values["handle-$lc"] = 'handle';
@@ -102,14 +81,6 @@ class contentExtensionMultilingual_FieldConvert extends JSONPage
                 ->success();
 
             // Insert into multilingual
-            // Symphony::Database()->query("
-            //     INSERT INTO `tbl_fields_multilingual_textbox`
-            //         (`field_id`, `column_length`, `text_size`, `text_formatter`, `text_validator`,
-            //          `text_length`, `text_cdata`, `text_handle`)
-            //     VALUES
-            //         ($id, $column_length, '$text_size', '$text_formatter', '$text_validator',
-            //          $text_length, '$text_cdata', '$text_handle')
-            // ");
             Symphony::Database()
                 ->insert('tbl_fields_multilingual_textbox')
                 ->values([
@@ -126,10 +97,6 @@ class contentExtensionMultilingual_FieldConvert extends JSONPage
                 ->success();
 
             // remove from textbox
-            // Symphony::Database()->query("
-            //     DELETE FROM `tbl_fields_textbox`
-            //         WHERE `field_id` = $id
-            // ");
             Symphony::Database()
                 ->delete('tbl_fields_textbox')
                 ->where(['field_id' => $id])
@@ -137,10 +104,6 @@ class contentExtensionMultilingual_FieldConvert extends JSONPage
                 ->success();
 
             // update type
-            // Symphony::Database()->query("
-            //     UPDATE `tbl_fields` SET `type` = 'multilingual_textbox'
-            //         WHERE `id` = $id
-            // ");
             Symphony::Database()
                 ->update('tbl_fields')
                 ->set([

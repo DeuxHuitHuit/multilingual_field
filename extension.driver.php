@@ -27,7 +27,6 @@ class Extension_Multilingual_Field extends Extension
         if (version_compare($previousVersion, '2.0', '<')) {
             $v1x_table = 'tbl_fields_multilingual';
 
-            // $fields = Symphony::Database()->fetch(sprintf("SELECT field_id FROM `%s`", $v1x_table));
             $fields = Symphony::Database()
                 ->select(['field_id'])
                 ->from($v1x_table)
@@ -39,7 +38,6 @@ class Extension_Multilingual_Field extends Extension
                     $entries_table = 'tbl_entries_data_' . $field["field_id"];
 
                     if (!$textboxExt->updateHasColumn('value', $entries_table)) {
-                        // Symphony::Database()->query("ALTER TABLE `{$entries_table}` ADD COLUMN `value` TEXT DEFAULT NULL");
                         Symphony::Database()
                             ->alter($entries_table)
                             ->add([
@@ -60,7 +58,6 @@ class Extension_Multilingual_Field extends Extension
 
                     foreach (FLang::getLangs() as $lc) {
                         if (!$textboxExt->updateHasColumn('handle-' . $lc, $entries_table)) {
-                            // Symphony::Database()->query("ALTER TABLE `{$entries_table}` ADD COLUMN `handle-{$lc}` TEXT DEFAULT NULL");
                             Symphony::Database()
                                 ->alter($entries_table)
                                 ->add([
@@ -72,7 +69,6 @@ class Extension_Multilingual_Field extends Extension
                                 ->execute()
                                 ->success();
 
-                            // $values = Symphony::Database()->fetch("SELECT `id`, `entry_id`, `value-{$lc}` FROM `{$entries_table}` WHERE `handle` IS NOT NULL");
                             $values = Symphony::Database()
                                 ->select(['id', 'entry_id', "value-$lc"])
                                 ->from($entries_table)
@@ -81,7 +77,6 @@ class Extension_Multilingual_Field extends Extension
                                 ->rows();
 
                             foreach ($values as $value) {
-                                // Symphony::Database()->query("UPDATE  `{$entries_table}` SET `handle-{$lc}` = '" . $this->createHandle($value["value-" . $lc], $value["entry_id"], $lc, $entries_table) . "' WHERE id = " . $value["id"]);
                                 Symphony::Database()
                                     ->alter($entries_table)
                                     ->set("handle-$lc")
@@ -96,7 +91,6 @@ class Extension_Multilingual_Field extends Extension
             }
 
             if (version_compare($previousVersion, '1.4', '<')) {
-                // Symphony::Database()->query(sprintf("ALTER TABLE `%s` ADD COLUMN `unique_handle` ENUM('yes','no') DEFAULT 'yes'", $v1x_table));
                 Symphony::database()
                     ->alter($v1x_table)
                     ->add([
@@ -109,7 +103,6 @@ class Extension_Multilingual_Field extends Extension
                     ->execute()
                     ->success();
 
-                // Symphony::Database()->query(sprintf("UPDATE `%s` SET `unique_handle` = 'yes'", $v1x_table));
                 Symphony::database()
                     ->alter($v1x_table)
                     ->set('unique_handle')
@@ -119,7 +112,6 @@ class Extension_Multilingual_Field extends Extension
             }
 
             if (version_compare($previousVersion, '1.4.1', '<')) {
-                // Symphony::Database()->query(sprintf("ALTER TABLE `%s` ADD COLUMN `use_def_lang_vals` ENUM('yes','no') DEFAULT 'yes'", $v1x_table));
                 Symphony::database()
                     ->alter($v1x_table)
                     ->add([
@@ -132,7 +124,6 @@ class Extension_Multilingual_Field extends Extension
                     ->execute()
                     ->success();
 
-                // Symphony::Database()->query(sprintf("UPDATE `%s` SET `use_def_lang_vals` = 'yes'", $v1x_table));
                 Symphony::database()
                     ->alter($v1x_table)
                     ->set('use_def_lang_vals')
@@ -142,20 +133,12 @@ class Extension_Multilingual_Field extends Extension
             }
 
             if (version_compare($previousVersion, '2.0', '<')) {
-                // Symphony::Database()->query(sprintf(
-                //     "RENAME TABLE `%s` TO `%s`;",
-                //     $v1x_table, self::FIELD_TABLE
-                // ));
                 Symphony::database()
                     ->rename($v1x_table)
                     ->to(self::FIELD_TABLE)
                     ->execute()
                     ->success();
 
-                // Symphony::Database()->query(sprintf(
-                //     "UPDATE `tbl_fields` SET `type` = '%s' WHERE `type` = '%s'",
-                //     'multilingual_textbox', 'multilingual'
-                // ));
                 Symphony::Database()
                     ->alter('tbl_fields')
                     ->set('type')
@@ -164,16 +147,6 @@ class Extension_Multilingual_Field extends Extension
                     ->execute()
                     ->success();
 
-                // Symphony::Database()->query(sprintf(
-                //     "ALTER TABLE `%s`
-                //         CHANGE `formatter` `text_formatter` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
-                //         CHANGE `unique_handle` `text_handle` ENUM('yes', 'no') CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT 'yes',
-                //         CHANGE `use_def_lang_vals` `def_ref_lang`  ENUM('yes', 'no') CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT 'no',
-                //         MODIFY `text_validator` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
-                //         MODIFY `text_size` ENUM('single', 'small', 'medium', 'large', 'huge') CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT 'medium',
-                //         ADD `text_cdata` ENUM('yes', 'no') CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT 'no';",
-                //     self::FIELD_TABLE
-                // ));
                 Symphony::Database()
                     ->alter(self::FIELD_TABLE)
                     ->change(['formatter', 'unique_handle', 'use_def_lang_vals'], [
@@ -225,10 +198,6 @@ class Extension_Multilingual_Field extends Extension
                     ->execute()
                     ->success();
 
-                // Symphony::Database()->query(sprintf(
-                //     "UPDATE  `%s` SET `text_cdata` = 'no'",
-                //     self::FIELD_TABLE
-                // ));
                 Symphony::Database()
                     ->alter(self::FIELD_TABLE)
                     ->set('text_cdata')
@@ -239,12 +208,6 @@ class Extension_Multilingual_Field extends Extension
                 foreach ($fields as $field) {
                     $entries_table = 'tbl_entries_data_' . $field["field_id"];
 
-                    // Symphony::Database()->query(sprintf(
-                    //     'ALTER TABLE `%1$s`
-                    //         MODIFY `handle` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
-                    //         MODIFY `value` TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL;',
-                    //     $entries_table
-                    // ));
                     Symphony::Database()
                         ->alter($entries_table)
                         ->modify([
@@ -266,16 +229,6 @@ class Extension_Multilingual_Field extends Extension
 
                     foreach (FLang::getLangs() as $lc) {
                         if (!$textboxExt->updateHasColumn('value_formatted-' . $lc, $entries_table)) {
-                            // Symphony::Database()->query(sprintf(
-                            //     'ALTER TABLE `%1$s`
-                            //         CHANGE COLUMN `value_format-%2$s` `value_formatted-%2$s` TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
-                            //         MODIFY `handle-%2$s` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
-                            //         MODIFY `value-%2$s` TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
-                            //         MODIFY `word_count-%2$s` INT(11) UNSIGNED DEFAULT NULL,
-                            //         ADD FULLTEXT KEY `value-%2$s` (`value-%2$s`),
-                            //         ADD FULLTEXT KEY `value_formatted-%2$s` (`value_formatted-%2$s`);',
-                            //     $entries_table, $lc
-                            // ));
                             Symphony::Database()
                                 ->alter($entries_table)
                                 ->change("value_format-$lc", [
@@ -317,12 +270,6 @@ class Extension_Multilingual_Field extends Extension
         }
 
         if (version_compare($previousVersion, '3.0', '<')) {
-            // Symphony::Database()->query(sprintf(
-            //     "ALTER TABLE `%s`
-            //         CHANGE COLUMN `def_ref_lang` `default_main_lang` ENUM('yes', 'no') CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT 'no',
-            //         ADD `required_languages` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL;",
-            //     self::FIELD_TABLE
-            // ));
             Symphony::Database()
                 ->alter(self::FIELD_TABLE)
                 ->change('def_ref_lang', [
@@ -361,14 +308,6 @@ class Extension_Multilingual_Field extends Extension
         foreach($textbox_fields as $field) {
             $table = "tbl_entries_data_" . $field->get('id');
             try {
-                // We need to drop the key, because we will alter
-                // it when altering the column.
-                // Symphony::Database()->query("
-                //     ALTER TABLE
-                //         `$table`
-                //     DROP KEY
-                //         `handle`
-                // ");
                 Symphony::Database()
                     ->alter($table)
                     ->dropKey('handle')
@@ -418,25 +357,6 @@ class Extension_Multilingual_Field extends Extension
 
     private function createFieldTable()
     {
-        // return Symphony::Database()->query(sprintf("
-        //     CREATE TABLE IF NOT EXISTS `%s` (
-        //         `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-        //         `field_id` INT(11) UNSIGNED NOT NULL,
-        //         `column_length` INT(11) UNSIGNED DEFAULT 75,
-        //         `text_size` ENUM('single', 'small', 'medium', 'large', 'huge') DEFAULT 'medium',
-        //         `text_formatter` VARCHAR(255) DEFAULT NULL,
-        //         `text_validator` VARCHAR(255) DEFAULT NULL,
-        //         `text_length` INT(11) UNSIGNED DEFAULT 0,
-        //         `text_cdata` ENUM('yes', 'no') DEFAULT 'no',
-        //         `text_handle` ENUM('yes', 'no') DEFAULT 'no',
-        //         `handle_unique` ENUM('yes', 'no') NOT NULL DEFAULT 'yes',
-        //         `default_main_lang` ENUM('yes', 'no') DEFAULT 'no',
-        //         `required_languages` VARCHAR(255) DEFAULT NULL,
-        //         PRIMARY KEY (`id`),
-        //         UNIQUE KEY `field_id` (`field_id`)
-        //     ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;",
-        //     self::FIELD_TABLE
-        // ));
         return Symphony::Database()
             ->create(self::FIELD_TABLE)
             ->ifNotExists()
@@ -504,10 +424,6 @@ class Extension_Multilingual_Field extends Extension
 
     private function dropFieldTable()
     {
-        // return Symphony::Database()->query(sprintf(
-        //     "DROP TABLE IF EXISTS `%s`",
-        //     self::FIELD_TABLE
-        // ));
         return Symphony::Database()
             ->drop(self::FIELD_TABLE)
             ->ifExists()
@@ -534,20 +450,6 @@ class Extension_Multilingual_Field extends Extension
 
     private function isHandleLocked($handle, $entry_id, $lang, $tbl)
     {
-        // return (boolean) Symphony::Database()->fetchVar('id', 0, sprintf(
-        //     "
-        //     SELECT
-        //         f.id
-        //     FROM
-        //         `{$tbl}` AS f
-        //     WHERE
-        //         f.`handle-{$lang}` = '%s'
-        //         %s
-        //     LIMIT 1
-        // ",
-        //     $handle,
-        //     (!is_null($entry_id) ? "AND f.entry_id != '{$entry_id}'" : '')
-        // ));
         $q = Symphony::Database()
             ->select(['f.id'])
             ->from($tbl, 'f')
@@ -670,7 +572,6 @@ class Extension_Multilingual_Field extends Extension
                 $entries_table = "tbl_entries_data_{$field["field_id"]}";
 
                 try {
-                    // $current_columns = Symphony::Database()->fetch("SHOW COLUMNS FROM `$entries_table` LIKE 'handle-%';");
                     $current_columns = Symphony::Database()
                         ->showColumns()
                         ->from($entries_table)
@@ -679,10 +580,6 @@ class Extension_Multilingual_Field extends Extension
                         ->rows();
                 } catch (DatabaseException $dbe) {
                     // Field doesn't exist. Better remove it's settings
-                    // Symphony::Database()->query(sprintf(
-                    //         "DELETE FROM `%s` WHERE `field_id` = %s;",
-                    //         self::FIELD_TABLE, $field["field_id"])
-                    // );
                     Symphony::Database()
                         ->delete(self::FIELD_TABLE)
                         ->where(['field_id' => $field["field_id"]])
@@ -705,13 +602,6 @@ class Extension_Multilingual_Field extends Extension
 
                         // If not consolidate option AND column lang_code not in supported languages codes -> drop Column
                         if (!$consolidate && !in_array($lc, $new_languages)) {
-                            // Symphony::Database()->query(
-                            //     "ALTER TABLE `$entries_table`
-                            //         DROP COLUMN `handle-$lc`,
-                            //         DROP COLUMN `value-$lc`,
-                            //         DROP COLUMN `value_formatted-$lc`,
-                            //         DROP COLUMN `word_count-$lc`;"
-                            // );
                             Symphony::Database()
                                 ->alter($entries_table)
                                 ->drop(["handle-$lc", "value-$lc", "value_formatted-$lc", "word_count-$lc"])
@@ -728,13 +618,6 @@ class Extension_Multilingual_Field extends Extension
                 foreach ($new_languages as $lc) {
                     // if columns for language don't exist, create them
                     if (!in_array("handle-$lc", $valid_columns)) {
-                        // Symphony::Database()->query(
-                        //     "ALTER TABLE `$entries_table`
-                        //         ADD COLUMN `handle-$lc` VARCHAR(255) DEFAULT NULL,
-                        //         ADD COLUMN `value-$lc` TEXT DEFAULT NULL,
-                        //         ADD COLUMN `value_formatted-$lc` TEXT DEFAULT NULL,
-                        //         ADD COLUMN `word_count-$lc` INT(11) DEFAULT NULL;"
-                        // );
                         Symphony::Database()
                             ->alter($entries_table)
                             ->add([
