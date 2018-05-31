@@ -17,7 +17,7 @@ class Extension_Multilingual_Field extends Extension
 
     public function install()
     {
-        $this->createFieldTable();
+        return $this->createFieldTable();
     }
 
     public function update($previousVersion = false)
