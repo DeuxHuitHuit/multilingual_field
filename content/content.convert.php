@@ -29,10 +29,10 @@ class contentExtensionMultilingual_FieldConvert extends JSONPage
             return;
         }
 
-        $id = MySQL::cleanValue($this->_context[0]);
+        $id = $this->_context[0];
         $this->_Result['ok'] = true;
 
-        $field = FieldManager::fetch($id);
+        $field = (new FieldManager)->select()->field($id)->execute()->next();
 
         if ($field == null || !($field instanceof FieldTextBox)) {
             $this->_Result['error'] = "Field $id not found.";
@@ -47,13 +47,13 @@ class contentExtensionMultilingual_FieldConvert extends JSONPage
                 throw new Exception('No language found. Please check that you have at least one.');
             }
 
-            $column_length = MySQL::cleanValue($field->get('column_length'));
-            $text_size = MySQL::cleanValue($field->get('text_size'));
-            $text_formatter = MySQL::cleanValue($field->get('text_formatter'));
-            $text_validator = MySQL::cleanValue($field->get('text_validator'));
-            $text_length = MySQL::cleanValue($field->get('text_length'));
-            $text_cdata = MySQL::cleanValue($field->get('text_cdata'));
-            $text_handle = MySQL::cleanValue($field->get('text_handle'));
+            $column_length = $field->get('column_length');
+            $text_size = $field->get('text_size');
+            $text_formatter = $field->get('text_formatter');
+            $text_validator = $field->get('text_validator');
+            $text_length = $field->get('text_length');
+            $text_cdata = $field->get('text_cdata');
+            $text_handle = $field->get('text_handle');
 
             // ALTER data table SQL: add new cols
             $entries_table = "tbl_entries_data_$id";
@@ -69,10 +69,10 @@ class contentExtensionMultilingual_FieldConvert extends JSONPage
             // Copy values
             $values = array();
             foreach ($langs as $lc) {
-                $values["handle-$lc"] = 'handle';
-                $values["value-$lc"] = 'value';
-                $values["value_formatted-$lc"] = 'value_formatted';
-                $values["word_count-$lc"] = 'word_count';
+                $values["handle-$lc"] = '$handle';
+                $values["value-$lc"] = '$value';
+                $values["value_formatted-$lc"] = '$value_formatted';
+                $values["word_count-$lc"] = '$word_count';
             }
             Symphony::Database()
                 ->update($entries_table)
