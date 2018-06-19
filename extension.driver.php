@@ -104,9 +104,10 @@ class Extension_Multilingual_Field extends Extension
                     ->success();
 
                 Symphony::database()
-                    ->alter($v1x_table)
-                    ->set('unique_handle')
-                    ->value('yes')
+                    ->update($v1x_table)
+                    ->set([
+                        'unique_handle' => 'yes',
+                    ])
                     ->execute()
                     ->success();
             }
@@ -125,8 +126,10 @@ class Extension_Multilingual_Field extends Extension
                     ->success();
 
                 Symphony::database()
-                    ->alter($v1x_table)
-                    ->set('use_def_lang_vals')
+                    ->update($v1x_table)
+                    ->set([
+                        'use_def_lang_vals' => 'yes'
+                    ])
                     ->value('yes')
                     ->execute()
                     ->success();
@@ -140,9 +143,8 @@ class Extension_Multilingual_Field extends Extension
                     ->success();
 
                 Symphony::Database()
-                    ->alter('tbl_fields')
-                    ->set('type')
-                    ->value('multilingual_textbox')
+                    ->update('tbl_fields')
+                    ->set(['type' => 'multilingual_textbox'])
                     ->where(['type' => 'multilingual'])
                     ->execute()
                     ->success();
