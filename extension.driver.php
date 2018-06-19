@@ -199,9 +199,10 @@ class Extension_Multilingual_Field extends Extension
                     ->success();
 
                 Symphony::Database()
-                    ->alter(self::FIELD_TABLE)
-                    ->set('text_cdata')
-                    ->value('no')
+                    ->update(self::FIELD_TABLE)
+                    ->set([
+                        'text_cdata' => 'no',
+                    ])
                     ->execute()
                     ->success();
 
@@ -295,7 +296,7 @@ class Extension_Multilingual_Field extends Extension
 
         // is handle unique:
         if (!$textboxExt->updateHasColumn('handle_unique', self::FIELD_TABLE)) {
-            $textboxExt->updateAddColumn('handle_unique', "ENUM('yes', 'no') NOT NULL DEFAULT 'yes' AFTER `text_handle`", self::FIELD_TABLE);
+            $textboxExt->updateAddColumn('handle_unique', ['type' => 'enum', 'values' => ['yes', 'no'], 'default' => 'yes'], self::FIELD_TABLE, 'text_handle');
         }
 
         // add field_id unique key
@@ -304,9 +305,15 @@ class Extension_Multilingual_Field extends Extension
         }
 
         // add entry_id unique key
-        $textbox_fields = FieldManager::fetch(null, null, 'ASC', 'sortorder', 'multilingual_textbox');
+        $textbox_fields = (new FieldManager)
+            ->select()
+            ->sort('sortorder', 'asc')
+            ->type('multilingual_textbox')
+            ->execute()
+            ->rows();
+
         foreach($textbox_fields as $field) {
-            $table = "tbl_entries_data_" . $field->get('id');
+            $table = 'tbl_entries_data_' . $field->get('id');
             try {
                 Symphony::Database()
                     ->alter($table)
@@ -317,22 +324,10 @@ class Extension_Multilingual_Field extends Extension
                 // ignore
             }
             // Handle length
-            $textboxExt->updateModifyColumn('handle', 'VARCHAR(1024)', $table);
+            $textboxExt->updateModifyColumn('handle', 'varchar(1024)', $table);
             foreach (FLang::getLangs() as $lc) {
                 if ($textboxExt->updateHasColumn("handle-$lc", $table)) {
-                    try {
-                        // We need to drop the key, because we will alter
-                        // it when altering the column.
-                        Symphony::Database()->query("
-                            ALTER TABLE
-                                `$table`
-                            DROP KEY
-                                `handle-$lc`
-                        ");
-                    } catch (Exception $ex) {
-                        // ignore
-                    }
-                    $textboxExt->updateModifyColumn("handle-$lc", 'VARCHAR(1024)', $table);
+                    $textboxExt->updateModifyColumn("handle-$lc", 'varchar(1024)', $table);
                 }
             }
 

@@ -32,7 +32,11 @@ class contentExtensionMultilingual_FieldConvert extends JSONPage
         $id = $this->_context[0];
         $this->_Result['ok'] = true;
 
-        $field = (new FieldManager)->select()->field($id)->execute()->next();
+        $field = (new FieldManager)
+            ->select()
+            ->field($id)
+            ->execute()
+            ->next();
 
         if ($field == null || !($field instanceof FieldTextBox)) {
             $this->_Result['error'] = "Field $id not found.";
