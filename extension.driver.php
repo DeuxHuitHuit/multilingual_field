@@ -326,10 +326,10 @@ class Extension_Multilingual_Field extends Extension
                 // ignore
             }
             // Handle length
-            $textboxExt->updateModifyColumn('handle', 'varchar(1024)', $table);
+            $textboxExt->updateModifyColumn('handle', ['type' => 'varchar(1024)', 'null' => true], $table);
             foreach (FLang::getLangs() as $lc) {
                 if ($textboxExt->updateHasColumn("handle-$lc", $table)) {
-                    $textboxExt->updateModifyColumn("handle-$lc", 'varchar(1024)', $table);
+                    $textboxExt->updateModifyColumn("handle-$lc", ['type' => 'varchar(1024)', 'null' => true], $table);
                 }
             }
 

@@ -634,14 +634,12 @@ class fieldMultilingual_TextBox extends FieldTextBox
 
     private function getCurrentData($entry_id)
     {
-        $query = sprintf(
-            'SELECT * FROM `tbl_entries_data_%d`
-            WHERE `entry_id` = %d',
-            $this->get('id'),
-            $entry_id
-        );
-
-        return Symphony::Database()->fetchRow(0, $query);
+        return Symphony::Database()
+            ->select(['*'])
+            ->from('tbl_entries_data_' . $this->get('id'))
+            ->where(['entry_id' => $entry_id])
+            ->execute()
+            ->next();
     }
 
     /*------------------------------------------------------------------------------------------------*/
