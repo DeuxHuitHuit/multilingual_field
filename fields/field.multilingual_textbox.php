@@ -143,7 +143,7 @@ class fieldMultilingual_TextBox extends FieldTextBox
             ->where(['f.entry_id' => $entry_id])
             ->limit(1)
             ->execute()
-            ->variable('handle');
+            ->variable("handle-$lc");
     }
 
     public function isHandleLocked($handle, $entry_id, $lc = null)
