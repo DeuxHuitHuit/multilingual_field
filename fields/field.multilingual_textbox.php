@@ -24,7 +24,7 @@ class fieldMultilingual_TextBox extends FieldTextBox
     {
         $cols = array();
         foreach (FLang::getLangs() as $lc) {
-            $cols[] = "`handle-{$lc}` VARCHAR(255) DEFAULT NULL,";
+            $cols[] = "`handle-{$lc}` VARCHAR(1024) DEFAULT NULL,";
             $cols[] = "`value-{$lc}` TEXT DEFAULT NULL,";
             $cols[] = "`value_formatted-{$lc}` TEXT DEFAULT NULL,";
             $cols[] = "`word_count-{$lc}` INT(11) UNSIGNED DEFAULT NULL,";
@@ -51,7 +51,7 @@ class fieldMultilingual_TextBox extends FieldTextBox
             CREATE TABLE IF NOT EXISTS `tbl_entries_data_{$field_id}` (
                 `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
                 `entry_id` INT(11) UNSIGNED NOT NULL,
-                `handle` VARCHAR(255) DEFAULT NULL,
+                `handle` VARCHAR(1024) DEFAULT NULL,
                 `value` TEXT DEFAULT NULL,
                 `value_formatted` TEXT DEFAULT NULL,
                 `word_count` INT(11) UNSIGNED DEFAULT NULL,";
