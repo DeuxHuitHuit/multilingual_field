@@ -28,6 +28,9 @@
 		<dependency version="2.7.0">textboxfield</dependency>
 	</dependencies>
 	<releases>
+		<release version="3.5.18" date="2018-09-06" min="2.6.0" max="2.x.x">
+			* Make the creation of new table have the 1024 handle as well (do not wait for an update!)
+		</release>
 		<release version="3.5.17" date="2018-02-09" min="2.6.0" max="2.x.x">
 			* Drop index before changing column
 			* Check the right table for the `text_handle` column
