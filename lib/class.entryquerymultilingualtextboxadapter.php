@@ -16,6 +16,17 @@ class EntryQueryMultilingualTextboxAdapter extends EntryQueryTextboxAdapter
         return parent::getFilterColumns();
     }
 
+    public function getBooleanFilterColumns()
+    {
+        $lc = FLang::getLangCode();
+
+        if ($lc) {
+            return ["value-$lc"];
+        }
+
+        return parent::getBooleanFilterColumns();
+    }
+
     public function getFilterColumns()
     {
         $lc = FLang::getLangCode();
