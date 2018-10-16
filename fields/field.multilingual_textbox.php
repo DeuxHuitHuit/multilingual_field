@@ -154,7 +154,7 @@ class fieldMultilingual_TextBox extends FieldTextBox
             ->where(["f.handle-$lc" => $handle]);
 
         if (!is_null($entry_id)) {
-            $q->where(['f.entry_id' => $entry_id]);
+            $q->where(['f.entry_id' => ['!=' => $entry_id]]);
         }
 
         return (boolean) $q->limit(1)->execute()->variable('id');
