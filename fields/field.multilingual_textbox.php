@@ -290,7 +290,7 @@ class fieldMultilingual_TextBox extends FieldTextBox
 
         array_unshift(
             $options,
-            array('all', $this->get('required') == 'yes', __('All')),
+            array('all', in_array('all', $required_languages), __('All')),
             array('main', in_array('main', $required_languages), __('Main language'))
         );
 
@@ -306,6 +306,7 @@ class fieldMultilingual_TextBox extends FieldTextBox
     public function commit()
     {
         $required_languages = $this->get('required_languages');
+        $original_required = $this->get('required');
 
         // all are required
         if (in_array('all', $required_languages)) {
@@ -325,7 +326,10 @@ class fieldMultilingual_TextBox extends FieldTextBox
 
         $this->set('required_languages', $required_languages);
 
-        if (!parent::commit()) {
+        $result = parent::commit();
+        $this->set('required', $original_required);
+
+        if (!$result) {
             return false;
         }
 
