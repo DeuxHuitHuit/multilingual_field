@@ -281,8 +281,10 @@ class fieldMultilingual_TextBox extends FieldTextBox
         $required_languages = $this->get('required_languages');
 
         $displayed_languages = FLang::getLangs();
+        $main_lang = null;
 
         if (($key = array_search(FLang::getMainLang(), $displayed_languages)) !== false) {
+            $main_lang = $displayed_languages[$key];
             unset($displayed_languages[$key]);
         }
 
@@ -291,7 +293,7 @@ class fieldMultilingual_TextBox extends FieldTextBox
         array_unshift(
             $options,
             array('all', in_array('all', $required_languages), __('All')),
-            array('main', in_array('main', $required_languages), __('Main language'))
+            array('main', in_array('main', $required_languages), '[' . strtoupper($main_lang) . '] ' . __('Main language'))
         );
 
         $label = Widget::Label(__('Required languages'));
