@@ -28,6 +28,10 @@
 		<dependency version="2.7.0">textboxfield</dependency>
 	</dependencies>
 	<releases>
+		<release version="3.5.19" date="2018-10-19" min="2.6.0" max="2.x.x">
+			* Fix sneaky error where All languages would become selected if the section had errors
+			* Add code of main language in the required select box
+		</release>
 		<release version="3.5.18" date="2018-09-06" min="2.6.0" max="2.x.x">
 			* Make the creation of new table have the 1024 handle as well (do not wait for an update!)
 		</release>
