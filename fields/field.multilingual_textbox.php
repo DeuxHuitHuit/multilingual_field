@@ -36,7 +36,7 @@ class fieldMultilingual_TextBox extends FieldTextBox
     {
         $keys = array();
         foreach (FLang::getLangs() as $lc) {
-            $keys[] = "KEY `handle-{$lc}` (`handle-{$lc}`),";
+            $keys[] = "KEY `handle-{$lc}` (`handle-{$lc}`(333)),";
             $keys[] = "FULLTEXT KEY `value-{$lc}` (`value-{$lc}`),";
             $keys[] = "FULLTEXT KEY `value_formatted-{$lc}` (`value_formatted-{$lc}`),";
         }
