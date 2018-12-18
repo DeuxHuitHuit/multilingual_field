@@ -65,8 +65,6 @@ class fieldMultilingual_TextBox extends FieldTextBox
         return $query = Symphony::Database()
             ->create("tbl_entries_data_$field_id")
             ->ifNotExists()
-            ->charset('utf8')
-            ->collate('utf8_unicode_ci')
             ->fields(array_merge([
                 'id' => [
                     'type' => 'int(11)',
