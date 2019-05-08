@@ -28,6 +28,9 @@
 		<dependency version="2.7.0">textboxfield</dependency>
 	</dependencies>
 	<releases>
+		<release version="3.5.20" date="2019-05-08" min="2.6.0" max="2.x.x">
+			* Patch for MySQL 5.7 strict mode, which can't create keys longer than 1000 bytes
+		</release>
 		<release version="3.5.19" date="2018-10-19" min="2.6.0" max="2.x.x">
 			* Fix sneaky error where All languages would become selected if the section had errors
 			* Add code of main language in the required select box
