@@ -36,7 +36,7 @@ class fieldMultilingual_TextBox extends FieldTextBox
     {
         $keys = array();
         foreach (FLang::getLangs() as $lc) {
-            $keys[] = "KEY `handle-{$lc}` (`handle-{$lc}`),";
+            $keys[] = "KEY `handle-{$lc}` (`handle-{$lc}`(333)),";
             $keys[] = "FULLTEXT KEY `value-{$lc}` (`value-{$lc}`),";
             $keys[] = "FULLTEXT KEY `value_formatted-{$lc}` (`value_formatted-{$lc}`),";
         }
@@ -65,7 +65,7 @@ class fieldMultilingual_TextBox extends FieldTextBox
         $query .= implode('', self::generateTableKeys());
 
         $query .= "
-                KEY `handle` (`handle`),
+                KEY `handle` (`handle`(333)),
                 FULLTEXT KEY `value` (`value`),
                 FULLTEXT KEY `value_formatted` (`value_formatted`)
             ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
